@@ -1,0 +1,666 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TUPA{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+    }
+    
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .user-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid #EBC165;
+        object-fit: cover;
+    }
+    
+    .user-role {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: rgba(197, 235, 219, 0.6);
+    }
+    
+    .user-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #EBC165;
+        letter-spacing: 0.05em;
+    }
+    
+    .report-label {
+        font-size: 0.85rem;
+        color: rgba(197, 235, 219, 0.7);
+        margin-bottom: 8px;
+    }
+    
+    .status-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #c5ebdb;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .status-check {
+        width: 32px;
+        height: 32px;
+        background: #22c55e;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.9rem;
+    }
+    
+    .metric-card {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(139, 146, 142, 0.15);
+        border-radius: 20px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .metric-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+    
+    .metric-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    
+    .metric-status {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+    }
+    
+    .metric-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #EBC165;
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+    
+    .metric-label {
+        font-size: 0.8rem;
+        color: rgba(197, 235, 219, 0.6);
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 28px 0 16px;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #c5ebdb;
+    }
+    
+    .section-link {
+        font-size: 0.75rem;
+        color: #EBC165;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+    
+    .alert-card {
+        background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 107, 107, 0.05));
+        border-left: 4px solid #ff6b6b;
+        border-radius: 16px;
+        padding: 16px 20px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+    }
+    
+    .alert-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 107, 107, 0.2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ff6b6b;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .alert-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #ff6b6b;
+        margin-bottom: 4px;
+    }
+    
+    .alert-text {
+        font-size: 0.8rem;
+        color: rgba(197, 235, 219, 0.6);
+        line-height: 1.4;
+    }
+    
+    .sensor-item {
+        background: rgba(11, 47, 37, 0.4);
+        border: 1px solid rgba(139, 146, 142, 0.1);
+        border-radius: 16px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+    
+    .sensor-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    
+    .sensor-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(152, 211, 183, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #98D3B7;
+        font-size: 1.1rem;
+    }
+    
+    .sensor-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #c5ebdb;
+        margin-bottom: 2px;
+    }
+    
+    .sensor-location {
+        font-size: 0.7rem;
+        color: rgba(197, 235, 219, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .sensor-status {
+        text-align: right;
+    }
+    
+    .sensor-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #98D3B7;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .sensor-signal {
+        font-size: 0.65rem;
+        color: rgba(197, 235, 219, 0.4);
+        margin-top: 2px;
+    }
+    
+    .online-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+        font-size: 0.65rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+    
+    .online-dot {
+        width: 6px;
+        height: 6px;
+        background: #22c55e;
+        border-radius: 50%;
+    }
+    
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        max-width: 100%;
+        background: rgba(11, 47, 37, 0.98);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(139, 146, 142, 0.2);
+        padding: 12px 0 20px;
+        z-index: 9999;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .bottom-nav .row {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    
+    .bottom-nav .col,
+    .bottom-nav [class*="col-"] {
+        flex: 0 0 25% !important;
+        max-width: 25% !important;
+        display: flex !important;
+        justify-content: center !important;
+        padding: 0 4px !important;
+        width: 25% !important;
+        float: none !important;
+    }
+    
+    @media (min-width: 768px) {
+        .bottom-nav {
+            padding: 16px 0 24px;
+        }
+        
+        .bottom-nav-item {
+            font-size: 0.75rem;
+        }
+        
+        .bottom-nav-item i {
+            font-size: 1.5rem;
+        }
+    }
+    
+    .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: rgba(197, 235, 219, 0.5);
+        text-decoration: none;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s ease;
+    }
+    
+    .bottom-nav-item:hover,
+    .bottom-nav-item.active {
+        color: #EBC165;
+    }
+    
+    .bottom-nav-item i {
+        font-size: 1.3rem;
+    }
+    
+    .bottom-nav-item.active i {
+        filter: drop-shadow(0 0 8px rgba(235, 193, 101, 0.5));
+    }
+</style>
+
+<!-- Header -->
+<div class="dashboard-header">
+    <div class="user-info">
+        {% if current_user.profile_image %}
+        <img src="{{ current_user.profile_image }}" alt="Profile" class="user-avatar">
+        {% else %}
+        <div class="user-avatar d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, rgba(152, 211, 183, 0.3), rgba(11, 47, 37, 0.6));">
+            <i class="fas fa-user" style="color: #EBC165;"></i>
+        </div>
+        {% endif %}
+        <div>
+            <div class="user-role">{{ current_user.user_type or 'Produtor' }}</div>
+            <div class="user-name">{{ current_user.username or 'Usuário' }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Label -->
+<div class="report-label">Relatório da Manhã</div>
+
+<!-- Status -->
+<div class="status-title">
+    Status Geral: Tudo Certo
+    <span class="status-check"><i class="fas fa-check"></i></span>
+</div>
+
+<!-- Metrics Grid -->
+<div class="row g-3 mb-2">
+    <div class="col-6">
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-icon" style="background: rgba(152, 211, 183, 0.15); color: #98D3B7;">
+                    <i class="fas fa-tint"></i>
+                </div>
+                <span class="metric-status">Normal</span>
+            </div>
+            <div class="metric-value">45%</div>
+            <div class="metric-label">Umidade do Solo</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-icon" style="background: rgba(235, 193, 101, 0.15); color: #EBC165;">
+                    <i class="fas fa-water"></i>
+                </div>
+                <span class="metric-status" style="background: rgba(235, 193, 101, 0.15); color: #EBC165;">Estável</span>
+            </div>
+            <div class="metric-value" style="color: #c5ebdb;">3.2m</div>
+            <div class="metric-label">Nível do Rio</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-3 mb-4">
+    <div class="col-3">
+        <a href="{{ url_for('main.monitor') }}" class="text-decoration-none">
+            <div class="metric-card text-center py-3">
+                <div class="metric-icon mx-auto mb-2" style="background: rgba(152, 211, 183, 0.15); color: #98D3B7;">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.7);">Monitor</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-3">
+        <a href="{{ url_for('main.devices') }}" class="text-decoration-none">
+            <div class="metric-card text-center py-3">
+                <div class="metric-icon mx-auto mb-2" style="background: rgba(235, 193, 101, 0.15); color: #EBC165;">
+                    <i class="fas fa-power-off"></i>
+                </div>
+                <div style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.7);">Devices</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-3">
+        <a href="{{ url_for('main.historic') }}" class="text-decoration-none">
+            <div class="metric-card text-center py-3">
+                <div class="metric-icon mx-auto mb-2" style="background: rgba(197, 235, 219, 0.15); color: #c5ebdb;">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.7);">Histórico</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-3">
+        <a href="{{ url_for('main.plantios') }}" class="text-decoration-none">
+            <div class="metric-card text-center py-3">
+                <div class="metric-icon mx-auto mb-2" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.7);">Plantios</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Planting Time Section -->
+<div class="section-header">
+    <h5 class="section-title">Tempo de Plantio</h5>
+    <span class="online-badge" style="background: rgba(235, 193, 101, 0.15); color: #EBC165;">
+        <i class="fas fa-seedling" style="font-size: 0.6rem;"></i>
+        3 Ativos
+    </span>
+</div>
+
+<div class="metric-card mb-3">
+    <div class="row align-items-center">
+        <div class="col-5">
+            <div style="position: relative; width: 120px; height: 120px; margin: 0 auto;">
+                {% if crops %}
+                {% set main_crop = crops[0] %}
+                {% set progress = main_crop.get_progress() %}
+                {% set dashoffset = 314 - (314 * progress / 100) %}
+                {% set stroke_color = '#22c55e' if progress >= 80 else '#EBC165' if progress >= 50 else '#ff6b6b' %}
+                <svg width="120" height="120" viewBox="0 0 120 120" style="transform: rotate(-90deg);">
+                    <!-- Background circle -->
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(139, 146, 142, 0.2)" stroke-width="8"/>
+                    <!-- Progress circle -->
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="{{ stroke_color }}" stroke-width="8" 
+                            stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="{{ dashoffset }}"/>
+                </svg>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: {{ stroke_color }};">{{ progress }}%</div>
+                    <div style="font-size: 0.6rem; color: rgba(197, 235, 219, 0.5); text-transform: uppercase;">Completo</div>
+                </div>
+                {% else %}
+                <svg width="120" height="120" viewBox="0 0 120 120" style="transform: rotate(-90deg);">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(139, 146, 142, 0.2)" stroke-width="8"/>
+                </svg>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: rgba(197, 235, 219, 0.5);">-</div>
+                    <div style="font-size: 0.6rem; color: rgba(197, 235, 219, 0.5); text-transform: uppercase;">Sem dados</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-7">
+            {% if crops %}
+            {% set main_crop = crops[0] %}
+            {% set progress = main_crop.get_progress() %}
+            {% set dashoffset = 314 - (314 * progress / 100) %}
+            {% set stroke_color = '#22c55e' if progress >= 80 else '#EBC165' if progress >= 50 else '#ff6b6b' %}
+            <div style="font-size: 0.9rem; font-weight: 600; color: #c5ebdb; margin-bottom: 12px;">
+                <i class="fas fa-leaf me-2" style="color: #98D3B7;"></i>{{ main_crop.name }} - {{ main_crop.crop_type|capitalize }}
+            </div>
+            <div style="display: flex; gap: 16px; margin-bottom: 8px;">
+                <div>
+                    <div style="font-size: 0.65rem; color: rgba(197, 235, 219, 0.5); text-transform: uppercase;">Início</div>
+                    <div style="font-size: 0.85rem; color: #c5ebdb;">{{ main_crop.planting_date.strftime('%d %b') if main_crop.planting_date else '-' }}</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.65rem; color: rgba(197, 235, 219, 0.5); text-transform: uppercase;">Colheita</div>
+                    <div style="font-size: 0.85rem; color: #EBC165; font-weight: 600;">{{ main_crop.estimated_harvest_date.strftime('%d %b') if main_crop.estimated_harvest_date else '-' }}</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.65rem; color: rgba(197, 235, 219, 0.5); text-transform: uppercase;">Faltam</div>
+                    {% if main_crop.estimated_harvest_date %}
+                    {% set days_left = (main_crop.estimated_harvest_date - now).days %}
+                    <div style="font-size: 0.85rem; color: #c5ebdb;">{{ days_left }} dias</div>
+                    {% else %}
+                    <div style="font-size: 0.85rem; color: #c5ebdb;">-</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.6);">
+                <i class="fas fa-info-circle me-1" style="color: #98D3B7;"></i>
+                Progresso: {{ progress }}%
+            </div>
+            {% else %}
+            <div style="font-size: 0.9rem; font-weight: 600; color: #c5ebdb; margin-bottom: 12px;">
+                <i class="fas fa-leaf me-2" style="color: #98D3B7;"></i>Nenhum plantio
+            </div>
+            <div style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.6);">
+                <i class="fas fa-info-circle me-1" style="color: #98D3B7;"></i>
+                Cadastre seu primeiro plantio
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Mini Planting Cards -->
+<div class="row g-2 mb-4">
+    {% for crop in crops[:2] %}
+    <div class="col-6">
+        <div class="metric-card" style="padding: 14px; height: 76px; display: flex; align-items: center;">
+            <div class="d-flex align-items-center gap-3" style="width: 100%;">
+                <div style="position: relative; width: 48px; height: 48px; flex-shrink: 0;">
+                    {% set progress = crop.get_progress() %}
+                    {% set stroke_color = '#22c55e' if progress >= 80 else '#EBC165' if progress >= 50 else '#ff6b6b' %}
+                    {% set dashoffset = 126 - (126 * progress / 100) %}
+                    <svg width="48" height="48" viewBox="0 0 48 48" style="transform: rotate(-90deg);">
+                        <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(139, 146, 142, 0.2)" stroke-width="4"/>
+                        <circle cx="24" cy="24" r="20" fill="none" stroke="{{ stroke_color }}" stroke-width="4" 
+                                stroke-linecap="round" stroke-dasharray="126" stroke-dashoffset="{{ dashoffset }}"/>
+                    </svg>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.7rem; font-weight: 700; color: {{ stroke_color }};">{{ progress }}%</div>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 0.8rem; font-weight: 600; color: #c5ebdb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ crop.crop_type|capitalize }}</div>
+                    <div style="font-size: 0.6rem; color: rgba(197, 235, 219, 0.5); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {% if crop.estimated_harvest_date %}
+                            {% set days_left = (crop.estimated_harvest_date - now).days %}
+                            {% if days_left > 0 %}
+                                {{ days_left }} dias
+                            {% else %}
+                                Pronto
+                            {% endif %}
+                        {% else %}
+                            {{ crop.name[:15] }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="metric-card" style="padding: 14px; height: 76px; text-align: center; color: rgba(197, 235, 219, 0.5); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <i class="fas fa-seedling" style="font-size: 1.5rem; margin-bottom: 8px;"></i>
+            <div style="font-size: 0.8rem;">Nenhum plantio cadastrado</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- News Carousel -->
+<div style="margin-bottom: 24px;">
+    <h2 style="font-size: 1.2rem; font-weight: 600; color: #c5ebdb; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <span>Notícias Agrícolas</span>
+        <span style="font-size: 0.7rem; background: rgba(235, 193, 101, 0.2); color: #EBC165; padding: 4px 12px; border-radius: 12px;">📰 Ao Vivo</span>
+    </h2>
+    <div style="background: rgba(11, 47, 37, 0.5); border: 1px solid rgba(139, 146, 142, 0.15); border-radius: 20px; padding: 20px; overflow: hidden;">
+        <div style="position: relative; overflow: hidden;">
+            <div style="display: flex; transition: transform 0.5s ease;" id="newsTrack">
+                {% for article in news %}
+                <div style="flex: 0 0 100%; padding: 16px; background: rgba(152, 211, 183, 0.05); border: 1px solid rgba(152, 211, 183, 0.1); border-radius: 12px;">
+                    <div style="font-size: 0.7rem; color: #EBC165; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{{ article.source.name }}</div>
+                    <div style="font-size: 1rem; font-weight: 600; color: #c5ebdb; margin-bottom: 8px; line-height: 1.4;">{{ article.title }}</div>
+                    <div style="font-size: 0.8rem; color: rgba(197, 235, 219, 0.6); line-height: 1.5; margin-bottom: 12px;">{{ article.description[:150] }}...</div>
+                    <a href="{{ article.url }}" target="_blank" style="font-size: 0.75rem; color: #98D3B7; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                        Ler mais <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 8px; margin-top: 16px;" id="carouselDots">
+            {% for article in news %}
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(139, 146, 142, 0.3); cursor: pointer; transition: all 0.3s ease;{% if loop.first %} background: #EBC165; transform: scale(1.2);{% endif %}" data-index="{{ loop.index0 }}"></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+// News Carousel Auto-play
+const newsTrack = document.getElementById('newsTrack');
+const dots = document.querySelectorAll('#carouselDots > div');
+let currentIndex = 0;
+const newsCount = {{ news|length }};
+
+if (newsCount > 0) {
+    setInterval(() => {
+        currentIndex = (currentIndex + 1) % newsCount;
+        newsTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+        
+        dots.forEach((dot, index) => {
+            dot.style.background = index === currentIndex ? '#EBC165' : 'rgba(139, 146, 142, 0.3)';
+            dot.style.transform = index === currentIndex ? 'scale(1.2)' : 'scale(1)';
+        });
+    }, 5000); // Muda a cada 5 segundos
+    
+    // Click on dots
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            currentIndex = index;
+            newsTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+            dots.forEach(d => {
+                d.style.background = 'rgba(139, 146, 142, 0.3)';
+                d.style.transform = 'scale(1)';
+            });
+            dot.style.background = '#EBC165';
+            dot.style.transform = 'scale(1.2)';
+        });
+    });
+}
+</script>
+
+<!-- Bottom Navigation -->
+<div style="height: 90px;"></div>
+
+<nav class="bottom-nav">
+    <div class="container">
+        <div class="row" style="display: flex; flex-direction: row; flex-wrap: nowrap; margin: 0;">
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.dashboard') }}" class="bottom-nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Início</span>
+                </a>
+            </div>
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.monitor') }}" class="bottom-nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Monitor</span>
+                </a>
+            </div>
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.alerts') }}" class="bottom-nav-item" style="position: relative;">
+                    <i class="fas fa-bell"></i>
+                    {% set unread = current_user.get_unread_alerts_count() %}
+                    {% if unread > 0 %}
+                    <span class="notification-badge">{{ unread }}</span>
+                    {% endif %}
+                    <span>Alertas</span>
+                </a>
+            </div>
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.profile') }}" class="bottom-nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Perfil</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}

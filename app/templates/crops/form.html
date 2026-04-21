@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - AgroTech{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">{{ title }}</h4>
+                <small>Fazenda: {{ farm.name }}</small>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                            {% for error in form.name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.variety.label(class="form-label") }}
+                            {{ form.variety(class="form-control" + (" is-invalid" if form.variety.errors else "")) }}
+                            {% for error in form.variety.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.planting_date.label(class="form-label") }}
+                            {{ form.planting_date(class="form-control" + (" is-invalid" if form.planting_date.errors else ""), type="date") }}
+                            {% for error in form.planting_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.harvest_date.label(class="form-label") }}
+                            {{ form.harvest_date(class="form-control" + (" is-invalid" if form.harvest_date.errors else ""), type="date") }}
+                            {% for error in form.harvest_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.area_hectares.label(class="form-label") }}
+                            {{ form.area_hectares(class="form-control" + (" is-invalid" if form.area_hectares.errors else ""), step="0.01") }}
+                            {% for error in form.area_hectares.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.expected_yield.label(class="form-label") }}
+                            {{ form.expected_yield(class="form-control" + (" is-invalid" if form.expected_yield.errors else ""), step="0.01") }}
+                            {% for error in form.expected_yield.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-success") }}
+                        <a href="{{ url_for('main.crops', farm_id=farm.id) }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

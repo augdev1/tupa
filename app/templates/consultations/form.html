@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Nova Consulta - AgroTech{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Nova Consulta Técnica</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else ""), placeholder="Ex: Problema com pragas na soja") }}
+                        {% for error in form.title.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.question.label(class="form-label") }}
+                        {{ form.question(class="form-control" + (" is-invalid" if form.question.errors else ""), rows=6, placeholder="Descreva sua dúvida ou problema em detalhes...") }}
+                        {% for error in form.question.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                        <div class="form-text">Seja específico para receber uma resposta mais precisa.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-success") }}
+                        <a href="{{ url_for('main.consultations') }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

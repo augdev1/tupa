@@ -1,0 +1,485 @@
+{% extends "base.html" %}
+
+{% block title %}Meus Plantios - TUPA{% endblock %}
+
+{% block content %}
+<style>
+    .plantios-header {
+        margin-bottom: 20px;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #c5ebdb;
+        line-height: 1.3;
+        margin-bottom: 8px;
+    }
+    
+    .page-subtitle {
+        font-size: 0.85rem;
+        color: rgba(197, 235, 219, 0.5);
+        line-height: 1.4;
+    }
+    
+    .btn-add-plantio {
+        width: 100%;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+        border: 2px dashed rgba(34, 197, 94, 0.4);
+        border-radius: 16px;
+        color: #22c55e;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-add-plantio:hover {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.15));
+        border-color: #22c55e;
+    }
+    
+    .plantio-card {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(139, 146, 142, 0.15);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 16px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .plantio-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #22c55e, #98D3B7);
+    }
+    
+    .plantio-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+    
+    .plantio-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+    }
+    
+    .plantio-info h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #c5ebdb;
+        margin-bottom: 4px;
+    }
+    
+    .plantio-location {
+        font-size: 0.75rem;
+        color: rgba(197, 235, 219, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .plantio-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: auto;
+    }
+    
+    .status-growing {
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+    }
+    
+    .status-harvest {
+        background: rgba(235, 193, 101, 0.15);
+        color: #EBC165;
+    }
+    
+    .plantio-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .metric-box {
+        background: rgba(11, 47, 37, 0.4);
+        border: 1px solid rgba(139, 146, 142, 0.1);
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+    }
+    
+    .metric-box-label {
+        font-size: 0.65rem;
+        color: rgba(197, 235, 219, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
+    }
+    
+    .metric-box-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #c5ebdb;
+    }
+    
+    .metric-box-value.urgent {
+        color: #ff6b6b;
+    }
+    
+    .metric-box-value.warning {
+        color: #EBC165;
+    }
+    
+    .plantio-progress {
+        margin-bottom: 16px;
+    }
+    
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        margin-bottom: 8px;
+    }
+    
+    .progress-label {
+        color: rgba(197, 235, 219, 0.6);
+    }
+    
+    .progress-value {
+        color: #EBC165;
+        font-weight: 600;
+    }
+    
+    .progress-bar {
+        height: 8px;
+        background: rgba(139, 146, 142, 0.15);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #22c55e, #98D3B7);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+    
+    .plantio-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .btn-action {
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-water {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-water:hover {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.15));
+    }
+    
+    .btn-details {
+        background: rgba(139, 146, 142, 0.15);
+        color: rgba(197, 235, 219, 0.8);
+        border: 1px solid rgba(139, 146, 142, 0.2);
+    }
+    
+    .btn-details:hover {
+        background: rgba(139, 146, 142, 0.25);
+    }
+    
+    /* Bottom Nav */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        max-width: 100%;
+        background: rgba(11, 47, 37, 0.98);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(139, 146, 142, 0.2);
+        padding: 12px 0 20px;
+        z-index: 9999;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .bottom-nav .row {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    
+    .bottom-nav .col,
+    .bottom-nav [class*="col-"] {
+        flex: 0 0 25% !important;
+        max-width: 25% !important;
+        display: flex !important;
+        justify-content: center !important;
+        padding: 0 4px !important;
+        width: 25% !important;
+        float: none !important;
+    }
+    
+    .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: rgba(197, 235, 219, 0.5);
+        text-decoration: none;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s ease;
+    }
+    
+    .bottom-nav-item:hover,
+    .bottom-nav-item.active {
+        color: #EBC165;
+    }
+    
+    .bottom-nav-item i {
+        font-size: 1.3rem;
+    }
+    
+    .bottom-nav-item.active i {
+        filter: drop-shadow(0 0 8px rgba(235, 193, 101, 0.5));
+    }
+</style>
+
+<!-- Header -->
+<div class="plantios-header">
+    <h1 class="page-title">Meus Plantios</h1>
+    <p class="page-subtitle">Gerencie seus cultivos e acompanhe o desenvolvimento.</p>
+</div>
+
+<!-- Botão Add Plantio -->
+<a href="{{ url_for('main.add_plantio') }}" class="btn-add-plantio">
+    <i class="fas fa-plus-circle"></i>
+    Adicionar Novo Plantio
+</a>
+
+{% if crops %}
+{% for crop in crops %}
+<div class="plantio-card">
+    <div class="plantio-header">
+        <div class="plantio-icon" style="background: rgba(235, 193, 101, 0.15); color: #EBC165;">
+            {% if 'milho' in crop.crop_type|lower %}🌽{% elif 'soja' in crop.crop_type|lower %}🌱{% elif 'arroz' in crop.crop_type|lower %}🌾{% else %}🌿{% endif %}
+        </div>
+        <div class="plantio-info">
+            <h3>{{ crop.name }}</h3>
+            <div class="plantio-location">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ crop.farm.name if crop.farm else 'Sem local' }} • {{ crop.area_hectares or '0' }} hectares
+            </div>
+        </div>
+        {% set days_to_harvest = (crop.estimated_harvest_date - now).days if crop.estimated_harvest_date else 0 %}
+        {% if days_to_harvest <= 7 and days_to_harvest > 0 %}
+        <span class="plantio-status-badge status-harvest">
+            <i class="fas fa-check-circle"></i>
+            Pronto
+        </span>
+        {% else %}
+        <span class="plantio-status-badge status-growing">
+            <i class="fas fa-seedling"></i>
+            Crescendo
+        </span>
+        {% endif %}
+    </div>
+    
+    <div class="plantio-metrics">
+        <div class="metric-box">
+            <div class="metric-box-label">Tempo Colheita</div>
+            <div class="metric-box-value {% if days_to_harvest <= 7 %}urgent{% elif days_to_harvest <= 15 %}warning{% endif %}">
+                {{ days_to_harvest }} dias
+            </div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-box-label">Próxima Rega</div>
+            <div class="metric-box-value">Em 2h</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-box-label">Umidade Solo</div>
+            <div class="metric-box-value">68%</div>
+        </div>
+    </div>
+    
+    {% set progress = crop.get_progress() if crop.get_progress else 50 %}
+    <div class="plantio-progress">
+        <div class="progress-header">
+            <span class="progress-label">Progresso do Cultivo</span>
+            <span class="progress-value">{{ progress }}%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ progress }}%;"></div>
+        </div>
+    </div>
+    
+    <div class="plantio-actions">
+        <button class="btn-action btn-water" onclick="regarPlantio('{{ crop.id }}')">
+            <i class="fas fa-tint"></i>
+            Regar Agora
+        </button>
+        <a href="{{ url_for('main.plantio_details', crop_id=crop.id) }}" class="btn-action btn-details">
+            <i class="fas fa-chart-line"></i>
+            Detalhes
+        </a>
+    </div>
+    <form action="{{ url_for('main.delete_plantio', crop_id=crop.id) }}" method="POST" style="margin-top: 10px;" onsubmit="return confirm('Tem certeza que deseja excluir este plantio?');">
+        <button type="submit" class="btn-action" style="background: rgba(255, 107, 107, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); width: 100%;">
+            <i class="fas fa-trash-alt"></i>
+            Excluir Plantio
+        </button>
+    </form>
+</div>
+{% endfor %}
+{% else %}
+<!-- Plantios de Exemplo (quando não há plantios cadastrados) -->
+<div class="plantio-card">
+    <div class="plantio-header">
+        <div class="plantio-icon" style="background: rgba(235, 193, 101, 0.15); color: #EBC165;">�</div>
+        <div class="plantio-info">
+            <h3>Milho - Exemplo</h3>
+            <div class="plantio-location">
+                <i class="fas fa-map-marker-alt"></i>
+                Fazenda Modelo • 15 hectares
+            </div>
+        </div>
+        <span class="plantio-status-badge status-growing">
+            <i class="fas fa-seedling"></i> Crescendo
+        </span>
+    </div>
+    <div class="plantio-metrics">
+        <div class="metric-box">
+            <div class="metric-box-label">Tempo Colheita</div>
+            <div class="metric-box-value warning">45 dias</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-box-label">Próxima Rega</div>
+            <div class="metric-box-value">Em 2h</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-box-label">Umidade Solo</div>
+            <div class="metric-box-value">68%</div>
+        </div>
+    </div>
+    <div class="plantio-progress">
+        <div class="progress-header">
+            <span class="progress-label">Progresso do Cultivo</span>
+            <span class="progress-value">35%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 35%;"></div>
+        </div>
+    </div>
+    <div class="plantio-actions">
+        <button class="btn-action btn-water" disabled>
+            <i class="fas fa-tint"></i> Regar
+        </button>
+        <button class="btn-action btn-details" disabled>
+            <i class="fas fa-chart-line"></i> Detalhes
+        </button>
+    </div>
+    <div style="margin-top: 10px; padding: 12px; background: rgba(235, 193, 101, 0.1); border-radius: 8px; text-align: center;">
+        <p style="font-size: 0.8rem; color: #EBC165; margin: 0;">
+            <i class="fas fa-info-circle"></i>
+            Cadastre seu primeiro plantio clicando no botão acima!
+        </p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Bottom Spacer -->
+<div style="height: 90px;"></div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+    <div class="container">
+        <div class="row" style="display: flex; flex-direction: row; flex-wrap: nowrap; margin: 0;">
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.dashboard') }}" class="bottom-nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Início</span>
+                </a>
+            </div>
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.monitor') }}" class="bottom-nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Monitor</span>
+                </a>
+            </div>
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.alerts') }}" class="bottom-nav-item" style="position: relative;">
+                    <i class="fas fa-bell"></i>
+                    {% set unread = current_user.get_unread_alerts_count() %}
+                    {% if unread > 0 %}
+                    <span style="position: absolute; top: -2px; right: calc(50% - 14px); width: 16px; height: 16px; background: #ff6b6b; border-radius: 50%; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; font-weight: 600; color: white;">{{ unread }}</span>
+                    {% endif %}
+                    <span>Alertas</span>
+                </a>
+            </div>
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.profile') }}" class="bottom-nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Perfil</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+function regarPlantio(lote) {
+    alert(`Irrigação iniciada no Lote ${lote}! 💧`);
+    // Aqui você faria a chamada API para acionar a bomba
+    // fetch(`/api/plantio/${lote}/regar`, { method: 'POST' })
+}
+</script>
+{% endblock %}

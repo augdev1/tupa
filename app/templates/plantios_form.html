@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - TUPA{% endblock %}
+
+{% block content %}
+<style>
+    .form-header {
+        margin-bottom: 24px;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #c5ebdb;
+        line-height: 1.3;
+        margin-bottom: 8px;
+    }
+    
+    .page-subtitle {
+        font-size: 0.85rem;
+        color: rgba(197, 235, 219, 0.5);
+        line-height: 1.4;
+    }
+    
+    .form-card {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(139, 146, 142, 0.15);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.85rem;
+        color: rgba(197, 235, 219, 0.7);
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+    
+    .form-label span.required {
+        color: #ff6b6b;
+        margin-left: 4px;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        background: rgba(11, 47, 37, 0.6);
+        border: 1px solid rgba(139, 146, 142, 0.2);
+        border-radius: 12px;
+        color: #c5ebdb;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #EBC165;
+        box-shadow: 0 0 0 3px rgba(235, 193, 101, 0.1);
+    }
+    
+    .form-input::placeholder {
+        color: rgba(197, 235, 219, 0.3);
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 14px 16px;
+        background: rgba(11, 47, 37, 0.6);
+        border: 1px solid rgba(139, 146, 142, 0.2);
+        border-radius: 12px;
+        color: #c5ebdb;
+        font-size: 0.95rem;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23EBC165' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+    }
+    
+    .form-select:focus {
+        outline: none;
+        border-color: #EBC165;
+    }
+    
+    .form-textarea {
+        width: 100%;
+        padding: 14px 16px;
+        background: rgba(11, 47, 37, 0.6);
+        border: 1px solid rgba(139, 146, 142, 0.2);
+        border-radius: 12px;
+        color: #c5ebdb;
+        font-size: 0.95rem;
+        min-height: 100px;
+        resize: vertical;
+        font-family: inherit;
+    }
+    
+    .form-textarea:focus {
+        outline: none;
+        border-color: #EBC165;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, #22c55e, rgba(34, 197, 94, 0.8));
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.2s ease;
+        margin-top: 24px;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+    
+    .btn-cancel {
+        width: 100%;
+        padding: 16px 24px;
+        background: rgba(139, 146, 142, 0.15);
+        color: rgba(197, 235, 219, 0.7);
+        border: 1px solid rgba(139, 146, 142, 0.2);
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        margin-top: 12px;
+    }
+    
+    .btn-cancel:hover {
+        background: rgba(139, 146, 142, 0.25);
+    }
+    
+    .error-message {
+        color: #ff6b6b;
+        font-size: 0.75rem;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    /* Bottom Nav */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        max-width: 100%;
+        background: rgba(11, 47, 37, 0.98);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(139, 146, 142, 0.2);
+        padding: 12px 0 20px;
+        z-index: 9999;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .bottom-nav .row {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    
+    .bottom-nav .col,
+    .bottom-nav [class*="col-"] {
+        flex: 0 0 25% !important;
+        max-width: 25% !important;
+        display: flex !important;
+        justify-content: center !important;
+        padding: 0 4px !important;
+        width: 25% !important;
+        float: none !important;
+    }
+    
+    .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: rgba(197, 235, 219, 0.5);
+        text-decoration: none;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s ease;
+    }
+    
+    .bottom-nav-item:hover,
+    .bottom-nav-item.active {
+        color: #EBC165;
+    }
+    
+    .bottom-nav-item i {
+        font-size: 1.3rem;
+    }
+</style>
+
+<!-- Header -->
+<div class="form-header">
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-subtitle">Cadastre um novo cultivo para monitoramento.</p>
+</div>
+
+<!-- Form Card -->
+<div class="form-card">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        
+        <!-- Nome do Plantio -->
+        <div class="form-group">
+            <label class="form-label">
+                Nome do Plantio <span class="required">*</span>
+            </label>
+            {{ form.name(class="form-input", placeholder="Ex: Milho Verão 2024") }}
+            {% if form.name.errors %}
+                {% for error in form.name.errors %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <!-- Tipo de Cultura -->
+        <div class="form-group">
+            <label class="form-label">
+                Tipo de Cultura <span class="required">*</span>
+            </label>
+            {{ form.crop_type(class="form-select") }}
+            {% if form.crop_type.errors %}
+                {% for error in form.crop_type.errors %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <!-- Dados da Fazenda (Somente Leitura) -->
+        <div class="form-section" style="background: rgba(235, 193, 101, 0.05); border: 1px solid rgba(235, 193, 101, 0.2); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+            <p class="text-center mb-3" style="color: rgba(197, 235, 219, 0.6); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">
+                <i class="fas fa-lock" style="color: #EBC165;"></i> Fazenda do Usuário
+            </p>
+            
+            <div class="form-group">
+                <label class="form-label">Nome da Fazenda</label>
+                <input type="text" class="form-input" value="{{ user_farm.name if user_farm else '' }}" disabled style="background: rgba(11, 47, 37, 0.5); color: #98D3B7; cursor: not-allowed;">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Localidade</label>
+                    <input type="text" class="form-input" value="{{ user_farm.city or user_farm.location if user_farm else '' }}" disabled style="background: rgba(11, 47, 37, 0.5); color: #98D3B7; cursor: not-allowed;">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Estado</label>
+                    <input type="text" class="form-input" value="{{ user_farm.state if user_farm else '' }}" disabled style="background: rgba(11, 47, 37, 0.5); color: #98D3B7; cursor: not-allowed;">
+                </div>
+            </div>
+            
+            <p style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.5); margin: 10px 0 0 0; text-align: center;">
+                <i class="fas fa-info-circle"></i> Para alterar dados da fazenda, edite seu perfil
+            </p>
+        </div>
+        
+        <!-- Datas -->
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">
+                    Data do Plantio <span class="required">*</span>
+                </label>
+                {{ form.planting_date(class="form-input", type="date") }}
+                {% if form.planting_date.errors %}
+                    {% for error in form.planting_date.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    Previsão de Colheita <span class="required">*</span>
+                </label>
+                {{ form.estimated_harvest_date(class="form-input", type="date") }}
+                {% if form.estimated_harvest_date.errors %}
+                    {% for error in form.estimated_harvest_date.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Área e Produção -->
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">
+                    Área (hectares)
+                </label>
+                {{ form.area_hectares(class="form-input", placeholder="Ex: 15", type="number", step="0.1") }}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    Produção Esperada (kg)
+                </label>
+                {{ form.expected_yield_kg(class="form-input", placeholder="Ex: 5000", type="number") }}
+            </div>
+        </div>
+        
+        <!-- Observações -->
+        <div class="form-group">
+            <label class="form-label">
+                Observações
+            </label>
+            {{ form.notes(class="form-textarea", placeholder="Informações adicionais sobre o plantio...") }}
+        </div>
+        
+        <!-- Botões -->
+        <button type="submit" class="btn-submit">
+            <i class="fas fa-save"></i>
+            Salvar Plantio
+        </button>
+        
+        <a href="{{ url_for('main.plantios') }}" class="btn-cancel">
+            <i class="fas fa-times"></i>
+            Cancelar
+        </a>
+    </form>
+</div>
+
+<!-- Bottom Spacer -->
+<div style="height: 90px;"></div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+    <div class="container">
+        <div class="row" style="display: flex; flex-direction: row; flex-wrap: nowrap; margin: 0;">
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.dashboard') }}" class="bottom-nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Início</span>
+                </a>
+            </div>
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.monitor') }}" class="bottom-nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Monitor</span>
+                </a>
+            </div>
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.alerts') }}" class="bottom-nav-item" style="position: relative;">
+                    <i class="fas fa-bell"></i>
+                    {% set unread = current_user.get_unread_alerts_count() %}
+                    {% if unread > 0 %}
+                    <span style="position: absolute; top: -2px; right: calc(50% - 14px); width: 16px; height: 16px; background: #ff6b6b; border-radius: 50%; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; font-weight: 600; color: white;">{{ unread }}</span>
+                    {% endif %}
+                    <span>Alertas</span>
+                </a>
+            </div>
+            <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                <a href="{{ url_for('main.profile') }}" class="bottom-nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Perfil</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}

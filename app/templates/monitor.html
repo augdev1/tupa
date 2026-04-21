@@ -1,0 +1,1076 @@
+{% extends "base.html" %}
+
+{% block title %}Monitoramento - TUPA{% endblock %}
+
+{% block content %}
+<style>
+    /* Ensure body has enough padding for bottom nav */
+    body {
+        padding-bottom: 100px !important;
+        min-height: 100vh;
+    }
+
+    .monitor-header {
+        margin-bottom: 20px;
+    }
+
+    .location-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        color: rgba(197, 235, 219, 0.6);
+        background: rgba(11, 47, 37, 0.5);
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(139, 146, 142, 0.2);
+        margin-bottom: 12px;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #c5ebdb;
+        line-height: 1.3;
+        margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+        font-size: 0.85rem;
+        color: rgba(197, 235, 219, 0.5);
+        line-height: 1.4;
+    }
+
+    .time-filter-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .time-tab {
+        padding: 8px 20px;
+        border-radius: 24px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: rgba(139, 146, 142, 0.15);
+        color: rgba(197, 235, 219, 0.6);
+        border: none;
+    }
+
+    .time-tab.active {
+        background: #EBC165;
+        color: #0B2F25;
+        font-weight: 600;
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .chart-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .mini-chart {
+        position: relative;
+        width: 100px;
+        height: 100px;
+    }
+
+    .mini-chart svg {
+        transform: rotate(-90deg);
+    }
+
+    .mini-chart-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .mini-chart-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #EBC165;
+        line-height: 1;
+    }
+
+    .mini-chart-value.temp {
+        color: #ff6b6b;
+    }
+
+    .mini-chart-label {
+        font-size: 0.55rem;
+        color: rgba(197, 235, 219, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 2px;
+    }
+
+    .chart-title {
+        font-size: 0.75rem;
+        color: #c5ebdb;
+        margin-top: 8px;
+        font-weight: 500;
+    }
+
+    .chart-subtitle {
+        font-size: 0.6rem;
+        color: rgba(197, 235, 219, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    /* Weather API Card */
+    .weather-card {
+        background: linear-gradient(135deg, rgba(11, 47, 37, 0.6), rgba(11, 47, 37, 0.4));
+        border: 1px solid rgba(139, 146, 142, 0.2);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .weather-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+
+    .weather-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #c5ebdb;
+    }
+
+    .weather-api-badge {
+        font-size: 0.6rem;
+        color: #22c55e;
+        background: rgba(34, 197, 94, 0.15);
+        padding: 4px 10px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .weather-main {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .weather-icon-large {
+        width: 60px;
+        height: 60px;
+        background: rgba(235, 193, 101, 0.15);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #EBC165;
+        font-size: 1.8rem;
+    }
+
+    .weather-temp {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #EBC165;
+    }
+
+    .weather-desc {
+        font-size: 0.85rem;
+        color: rgba(197, 235, 219, 0.7);
+    }
+
+    .weather-location {
+        font-size: 0.75rem;
+        color: rgba(197, 235, 219, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    /* Period Averages */
+    .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #c5ebdb;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-title::before {
+        content: '';
+        width: 3px;
+        height: 18px;
+        background: #EBC165;
+        border-radius: 2px;
+    }
+
+    .averages-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .average-card {
+        background: linear-gradient(135deg, rgba(235, 193, 101, 0.15), rgba(152, 211, 183, 0.1));
+        border: 1px solid rgba(235, 193, 101, 0.2);
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .average-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(11, 47, 37, 0.5);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0B2F25;
+        font-size: 1.2rem;
+    }
+
+    .average-info {
+        flex: 1;
+    }
+
+    .average-label {
+        font-size: 0.65rem;
+        color: rgba(11, 47, 37, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+    }
+
+    .average-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #0B2F25;
+    }
+
+    /* Planting Control Section */
+    .control-section {
+        margin-bottom: 24px;
+    }
+
+    .control-card {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(139, 146, 142, 0.15);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 12px;
+    }
+
+    .control-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+
+    .control-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #c5ebdb;
+    }
+
+    .control-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .control-status.active {
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+    }
+
+    .control-status.inactive {
+        background: rgba(255, 107, 107, 0.15);
+        color: #ff6b6b;
+    }
+
+    .control-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .control-btn {
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .control-btn.on {
+        background: linear-gradient(135deg, #22c55e, rgba(34, 197, 94, 0.8));
+        color: white;
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    }
+
+    .control-btn.off {
+        background: rgba(139, 146, 142, 0.2);
+        color: rgba(197, 235, 219, 0.6);
+        border: 1px solid rgba(139, 146, 142, 0.3);
+    }
+
+    .control-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .control-btn.on:hover {
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+
+    .pump-btn {
+        background: linear-gradient(135deg, #3b82f6, rgba(59, 130, 246, 0.8)) !important;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+    }
+
+    .pump-btn:hover {
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4) !important;
+    }
+
+    .led-btn {
+        background: linear-gradient(135deg, #a855f7, rgba(168, 85, 247, 0.8)) !important;
+        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3) !important;
+    }
+
+    .led-btn:hover {
+        box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4) !important;
+    }
+
+    /* Charts Line Section */
+    .line-chart-card {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(139, 146, 142, 0.15);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .line-chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+
+    .line-chart-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #c5ebdb;
+    }
+
+    .line-chart-subtitle {
+        font-size: 0.65rem;
+        color: rgba(197, 235, 219, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .line-chart-visual {
+        height: 120px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .line-path {
+        fill: none;
+        stroke-width: 3;
+        stroke-linecap: round;
+    }
+
+    .chart-days {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 12px;
+        padding: 0 10px;
+    }
+
+    .chart-day {
+        font-size: 0.6rem;
+        color: rgba(197, 235, 219, 0.4);
+        text-transform: uppercase;
+    }
+
+    /* Bottom Nav - Force Visible */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        max-width: 100%;
+        background: rgba(11, 47, 37, 0.98);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(139, 146, 142, 0.2);
+        padding: 12px 0 20px;
+        z-index: 9999;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .bottom-nav .container {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .bottom-nav .row {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .bottom-nav .col,
+    .bottom-nav [class*="col-"] {
+        flex: 0 0 25% !important;
+        max-width: 25% !important;
+        display: flex !important;
+        justify-content: center !important;
+        padding: 0 4px !important;
+        width: 25% !important;
+        float: none !important;
+    }
+
+    @media (min-width: 768px) {
+        .bottom-nav {
+            padding: 16px 0 24px;
+        }
+
+        .bottom-nav-item {
+            font-size: 0.75rem;
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.5rem;
+        }
+    }
+
+    .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: rgba(197, 235, 219, 0.5);
+        text-decoration: none;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s ease;
+    }
+
+    .bottom-nav-item:hover,
+    .bottom-nav-item.active {
+        color: #EBC165;
+    }
+
+    .bottom-nav-item i {
+        font-size: 1.3rem;
+    }
+
+    .bottom-nav-item.active i {
+        filter: drop-shadow(0 0 8px rgba(235, 193, 101, 0.5));
+    }
+</style>
+
+<!-- Header -->
+<div class="monitor-header">
+    <div class="location-badge">
+        <i class="fas fa-map-marker-alt"></i>
+        Manaus, Amazonas • API: OpenWeather
+    </div>
+    <h1 class="page-title">Monitoramento</h1>
+    <p class="page-subtitle">Monitoramento em tempo real dos sensores IoT.</p>
+
+    <!-- Time Filter -->
+    <div class="time-filter-tabs">
+        <button class="time-tab active" data-period="day">Dia</button>
+        <button class="time-tab" data-period="week">Semana</button>
+        <button class="time-tab" data-period="month">Mês</button>
+    </div>
+
+    <!-- Weather API Card (Amazonas) with integrated chart -->
+    <div class="weather-card">
+        <div class="weather-header">
+            <span class="weather-title">Clima Local (Amazonas)</span>
+            <span class="weather-api-badge">● Online</span>
+        </div>
+        <div class="weather-main">
+            <div class="weather-icon-large">
+                <i class="fas fa-cloud-sun"></i>
+            </div>
+            <div>
+                {% if weather_data and weather_data.get('current') %}
+                <div class="weather-temp">{{ weather_data.current.temperature_2m|round(1) }}°C</div>
+                <div class="weather-desc">
+                    {% if weather_data.current.relative_humidity_2m > 70 %}
+                    Muito úmido
+                    {% elif weather_data.current.relative_humidity_2m > 50 %}
+                    Parcialmente nublado
+                    {% else %}
+                    Limpo
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="weather-temp">--°C</div>
+                <div class="weather-desc">Dados não disponíveis</div>
+                {% endif %}
+                <div class="weather-location">
+                    <i class="fas fa-map-pin"></i>
+                    Manaus, AM
+                </div>
+            </div>
+        </div>
+        
+        <!-- Weather Chart Container (inside card) -->
+        <div id="weather-chart-container" class="weather-chart-container" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(139, 146, 142, 0.2);">
+            <!-- Daily Chart (default) -->
+            <div class="line-chart-card" style="padding: 16px; background: rgba(11, 47, 37, 0.3); border: none;">
+                <div class="line-chart-header" style="margin-bottom: 12px;">
+                    <div>
+                        <div class="line-chart-title" style="font-size: 0.9rem;">Temperatura</div>
+                        <div class="line-chart-subtitle" style="font-size: 0.65rem;">Dados em tempo real</div>
+                    </div>
+                    <div style="width: 32px; height: 32px; background: rgba(235, 193, 101, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #EBC165;">
+                        <i class="fas fa-thermometer-half" style="font-size: 0.9rem;"></i>
+                    </div>
+                </div>
+                <div class="line-chart-visual" style="height: 120px;">
+                    <svg width="100%" height="100%" viewBox="0 0 300 120" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="tempGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#EBC165;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#EBC165;stop-opacity:0" />
+                            </linearGradient>
+                        </defs>
+                        {% if weather_data and weather_data.get('daily', {}).get('temperature_2m_max') %}
+                        {% set temps_max = weather_data.daily.temperature_2m_max[:7] %}
+                        {% set temps_min = weather_data.daily.temperature_2m_min[:7] %}
+                        <path d="M 0,80 Q 50,75 75,70 T 150,65 T 225,60 T 300,55 L 300,120 L 0,120 Z" fill="url(#tempGradient)" />
+                        <path d="M 0,80 Q 50,75 75,70 T 150,65 T 225,60 T 300,55" class="line-path" stroke="#EBC165" stroke-width="2" fill="none"/>
+                        {% else %}
+                        <path d="M 0,80 Q 50,75 75,70 T 150,65 T 225,60 T 300,55 L 300,120 L 0,120 Z" fill="url(#tempGradient)" />
+                        <path d="M 0,80 Q 50,75 75,70 T 150,65 T 225,60 T 300,55" class="line-path" stroke="#EBC165" stroke-width="2" fill="none"/>
+                        {% endif %}
+                    </svg>
+                </div>
+                <div class="chart-days" style="margin-top: 8px; display: flex; justify-content: space-between; font-size: 0.65rem; color: rgba(197, 235, 219, 0.5);">
+                    <span>Hoje</span>
+                    <span>+1d</span>
+                    <span>+2d</span>
+                    <span>+3d</span>
+                    <span>+4d</span>
+                    <span>+5d</span>
+                    <span>+6d</span>
+                </div>
+            </div>
+            
+            <!-- Weekly Forecast Cards -->
+            <div class="weekly-forecast" style="margin-top: 16px; display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;">
+                {% if weather_data and weather_data.get('daily', {}).get('time') %}
+                {% set days_abbr = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] %}
+                {% for i in range(7) %}
+                {% set day_index = (weather_data.daily.time[i]|string).split('-')[2]|int if weather_data.daily.time[i] else 0 %}
+                {% set day_name = days_abbr[(day_index + 3) % 7] %}
+                {% set temp_max = weather_data.daily.temperature_2m_max[i] if weather_data.daily.temperature_2m_max else '--' %}
+                {% set temp_min = weather_data.daily.temperature_2m_min[i] if weather_data.daily.temperature_2m_min else '--' %}
+                {% set weather_code = weather_data.daily.weather_code[i] if weather_data.daily.weather_code else 0 %}
+                <div class="forecast-card" style="min-width: 70px; background: rgba(11, 47, 37, 0.5); border: 1px solid rgba(152, 211, 183, 0.15); border-radius: 12px; padding: 12px 8px; text-align: center;">
+                    <div style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.6); margin-bottom: 8px;">{{ day_name }}</div>
+                    <div style="font-size: 1.5rem; margin-bottom: 8px;">
+                        {% if weather_code >= 95 %}
+                        <i class="fas fa-bolt" style="color: #EBC165;"></i>
+                        {% elif weather_code >= 80 %}
+                        <i class="fas fa-cloud-showers-heavy" style="color: #3b82f6;"></i>
+                        {% elif weather_code >= 60 %}
+                        <i class="fas fa-cloud-rain" style="color: #3b82f6;"></i>
+                        {% elif weather_code >= 40 %}
+                        <i class="fas fa-cloud-sun" style="color: #EBC165;"></i>
+                        {% elif weather_code >= 20 %}
+                        <i class="fas fa-cloud" style="color: rgba(197, 235, 219, 0.6);"></i>
+                        {% else %}
+                        <i class="fas fa-sun" style="color: #EBC165;"></i>
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 0.85rem; color: #c5ebdb; font-weight: 500;">
+                        <span style="color: #EBC165;">{{ temp_max|round(0) if temp_max != '--' else '--' }}°</span>
+                        <span style="color: rgba(197, 235, 219, 0.5);"> / {{ temp_min|round(0) if temp_min != '--' else '--' }}°</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <!-- Fallback cards -->
+                {% for day in ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] %}
+                <div class="forecast-card" style="min-width: 70px; background: rgba(11, 47, 37, 0.5); border: 1px solid rgba(152, 211, 183, 0.15); border-radius: 12px; padding: 12px 8px; text-align: center;">
+                    <div style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.6); margin-bottom: 8px;">{{ day }}</div>
+                    <div style="font-size: 1.5rem; margin-bottom: 8px;">
+                        <i class="fas fa-cloud-sun" style="color: #EBC165;"></i>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #c5ebdb; font-weight: 500;">
+                        <span style="color: #EBC165;">30°</span>
+                        <span style="color: rgba(197, 235, 219, 0.5);"> / 24°</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+        <div
+            style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-top: 16px; border-top: 1px solid rgba(139, 146, 142, 0.2);">
+            <div style="text-align: center;">
+                <div style="font-size: 0.65rem; color: rgba(197, 235, 219, 0.5); text-transform: uppercase;">Umidade Ar
+                </div>
+                {% if weather_data and weather_data.get('current') %}
+                <div style="font-size: 1rem; font-weight: 600; color: #c5ebdb;">{{ weather_data.current.relative_humidity_2m|round(0) }}%</div>
+                {% else %}
+                <div style="font-size: 1rem; font-weight: 600; color: #c5ebdb;">--%</div>
+                {% endif %}
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 0.65rem; color: rgba(197, 235, 219, 0.5); text-transform: uppercase;">Vento
+                </div>
+                {% if weather_data and weather_data.get('current') %}
+                <div style="font-size: 1rem; font-weight: 600; color: #c5ebdb;">{{ weather_data.current.wind_speed_10m|round(1) if weather_data.current.get('wind_speed_10m') else '--' }} km/h</div>
+                {% else %}
+                <div style="font-size: 1rem; font-weight: 600; color: #c5ebdb;">-- km/h</div>
+                {% endif %}
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 0.65rem; color: rgba(197, 235, 219, 0.5); text-transform: uppercase;">Pressão
+                </div>
+                {% if weather_data and weather_data.get('current') %}
+                <div style="font-size: 1rem; font-weight: 600; color: #c5ebdb;">{{ weather_data.current.surface_pressure|round(0) if weather_data.current.get('surface_pressure') else '--' }} hPa</div>
+                {% else %}
+                <div style="font-size: 1rem; font-weight: 600; color: #c5ebdb;">-- hPa</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Grid - 3 Circular Charts -->
+    <div class="charts-grid">
+        <div class="chart-item">
+            <div class="mini-chart">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(139, 146, 142, 0.15)" stroke-width="8" />
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="#EBC165" stroke-width="8" stroke-linecap="round"
+                        stroke-dasharray="264" stroke-dashoffset="74" />
+                </svg>
+                <div class="mini-chart-center">
+                    <div class="mini-chart-value">72%</div>
+                    <div class="mini-chart-label">Solo</div>
+                </div>
+            </div>
+            <div class="chart-title">Umidade Solo</div>
+            <div class="chart-subtitle">Sensores A1-A4</div>
+        </div>
+
+        <div class="chart-item">
+            <div class="mini-chart">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(139, 146, 142, 0.15)" stroke-width="8" />
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="#98D3B7" stroke-width="8" stroke-linecap="round"
+                        stroke-dasharray="264" stroke-dashoffset="58" />
+                </svg>
+                <div class="mini-chart-center">
+                    <div class="mini-chart-value" style="color: #98D3B7;">78%</div>
+                    <div class="mini-chart-label">Ar</div>
+                </div>
+            </div>
+            <div class="chart-title">Umidade Ar</div>
+            <div class="chart-subtitle">Estação Clima</div>
+        </div>
+
+        <div class="chart-item">
+            <div class="mini-chart">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(139, 146, 142, 0.15)" stroke-width="8" />
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="#ff6b6b" stroke-width="8" stroke-linecap="round"
+                        stroke-dasharray="264" stroke-dashoffset="105" />
+                </svg>
+                <div class="mini-chart-center">
+                    {% if weather_data and weather_data.get('current') %}
+                    <div class="mini-chart-value temp">{{ weather_data.current.temperature_2m|round(1) }}°C</div>
+                    {% else %}
+                    <div class="mini-chart-value temp">--°C</div>
+                    {% endif %}
+                    <div class="mini-chart-label">Temp</div>
+                </div>
+            </div>
+            <div class="chart-title">Temperatura</div>
+            <div class="chart-subtitle">Manaus, AM</div>
+        </div>
+    </div>
+
+    <!-- Line Charts Side by Side -->
+    <div class="row g-2 mb-3">
+        <div class="col-6">
+            <div class="line-chart-card" style="padding: 12px;">
+                <div class="line-chart-header" style="margin-bottom: 8px;">
+                    <div>
+                        <div class="line-chart-title" style="font-size: 0.8rem;">Umidade do Solo</div>
+                        <div class="line-chart-subtitle" style="font-size: 0.55rem;">Sensores A1-A4</div>
+                    </div>
+                    <div style="width: 24px; height: 24px; background: rgba(152, 211, 183, 0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #98D3B7;">
+                        <i class="fas fa-tint" style="font-size: 0.7rem;"></i>
+                    </div>
+                </div>
+                <div class="line-chart-visual" style="height: 80px;">
+                    <svg width="100%" height="100%" viewBox="0 0 300 100" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="soilGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#98D3B7;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#98D3B7;stop-opacity:0" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M 0,80 Q 50,75 60,70 T 100,60 T 140,55 T 180,45 T 220,35 T 260,40 T 300,30 L 300,100 L 0,100 Z"
+                            fill="url(#soilGradient)" />
+                        <path d="M 0,80 Q 50,75 60,70 T 100,60 T 140,55 T 180,45 T 220,35 T 260,40 T 300,30" class="line-path"
+                            stroke="#98D3B7" />
+                    </svg>
+                </div>
+                <div class="chart-days" style="margin-top: 6px;">
+                    <span class="chart-day">S</span>
+                    <span class="chart-day">T</span>
+                    <span class="chart-day">Q</span>
+                    <span class="chart-day">Q</span>
+                    <span class="chart-day">S</span>
+                    <span class="chart-day">S</span>
+                    <span class="chart-day">D</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="line-chart-card" style="padding: 12px;">
+                <div class="line-chart-header" style="margin-bottom: 8px;">
+                    <div>
+                        <div class="line-chart-title" style="font-size: 0.8rem;">Nível da Água</div>
+                        <div class="line-chart-subtitle" style="font-size: 0.55rem;">Reservatório</div>
+                    </div>
+                    <div style="width: 24px; height: 24px; background: rgba(235, 193, 101, 0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #EBC165;">
+                        <i class="fas fa-water" style="font-size: 0.7rem;"></i>
+                    </div>
+                </div>
+                <div class="line-chart-visual" style="height: 80px;">
+                    <svg width="100%" height="100%" viewBox="0 0 300 100" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="waterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#EBC165;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#EBC165;stop-opacity:0" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M 0,70 Q 50,68 60,65 T 100,60 T 140,50 T 180,40 T 220,30 T 260,25 T 300,20 L 300,100 L 0,100 Z"
+                            fill="url(#waterGradient)" />
+                        <path d="M 0,70 Q 50,68 60,65 T 100,60 T 140,50 T 180,40 T 220,30 T 260,25 T 300,20" class="line-path"
+                            stroke="#EBC165" />
+                    </svg>
+                </div>
+                <div class="chart-days" style="margin-top: 6px;">
+                    <span class="chart-day">S</span>
+                    <span class="chart-day">T</span>
+                    <span class="chart-day">Q</span>
+                    <span class="chart-day">Q</span>
+                    <span class="chart-day">S</span>
+                    <span class="chart-day">S</span>
+                    <span class="chart-day">D</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Period Averages -->
+    <h2 class="section-title">Médias do Período</h2>
+    <div class="averages-grid">
+        <div class="average-card">
+            <div class="average-icon" style="color: #0B2F25;">
+                <i class="fas fa-thermometer-half"></i>
+            </div>
+            <div class="average-info">
+                <div class="average-label">Temperatura</div>
+                <div class="average-value">28.4°C</div>
+            </div>
+        </div>
+        <div class="average-card">
+            <div class="average-icon" style="color: #0B2F25;">
+                <i class="fas fa-tint"></i>
+            </div>
+            <div class="average-info">
+                <div class="average-label">Umidade Ar</div>
+                <div class="average-value">72%</div>
+            </div>
+        </div>
+        <div class="average-card">
+            <div class="average-icon" style="color: #0B2F25;">
+                <i class="fas fa-weight-hanging"></i>
+            </div>
+            <div class="average-info">
+                <div class="average-label">Pressão</div>
+                <div class="average-value">1012 hPa</div>
+            </div>
+        </div>
+        <div class="average-card">
+            <div class="average-icon" style="color: #0B2F25;">
+                <i class="fas fa-sun"></i>
+            </div>
+            <div class="average-info">
+                <div class="average-label">UV Index</div>
+                <div class="average-value">Médio</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planting Control Section -->
+    <h2 class="section-title">Controle do Plantio</h2>
+
+    <!-- Water Pump Control -->
+    <div class="control-card">
+        <div class="control-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div
+                    style="width: 40px; height: 40px; background: rgba(59, 130, 246, 0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #3b82f6;">
+                    <i class="fas fa-water"></i>
+                </div>
+                <div>
+                    <div class="control-title">Bomba de Irrigação</div>
+                    <div style="font-size: 0.7rem; color: rgba(197, 235, 219, 0.5);">Setor Norte • 12L/min</div>
+                </div>
+            </div>
+            <span class="control-status active">
+                <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>
+                Ligada
+            </span>
+        </div>
+        <div class="control-buttons">
+            <button class="control-btn on pump-btn" onclick="toggleDevice('pump', 'on')">
+                <i class="fas fa-power-off"></i>
+                Ligar
+            </button>
+            <button class="control-btn off" onclick="toggleDevice('pump', 'off')">
+                <i class="fas fa-stop"></i>
+                Desligar
+            </button>
+        </div>
+    </div>
+
+    <!-- UV LED Control -->
+    <div class="control-card">
+        <div class="control-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div
+                    style="width: 40px; height: 40px; background: rgba(168, 85, 247, 0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #a855f7;">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div>
+                    <div class="control-title">LED UV Cultivo</div>
+                    <div style="font-size: 0.7rem; color: rgba(197, 235, 219, 0.5);">Estufa A1 • 45W</div>
+                </div>
+            </div>
+            <span class="control-status inactive">
+                <span style="width: 6px; height: 6px; background: #ff6b6b; border-radius: 50%;"></span>
+                Desligada
+            </span>
+        </div>
+        <div class="control-buttons">
+            <button class="control-btn on led-btn" onclick="toggleDevice('led', 'on')">
+                <i class="fas fa-power-off"></i>
+                Ligar
+            </button>
+            <button class="control-btn off" onclick="toggleDevice('led', 'off')">
+                <i class="fas fa-stop"></i>
+                Desligar
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Spacer -->
+    <div style="height: 90px;"></div>
+
+    <nav class="bottom-nav">
+        <div class="container">
+            <div class="row" style="display: flex; flex-direction: row; flex-wrap: nowrap; margin: 0;">
+                <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                    <a href="{{ url_for('main.dashboard') }}" class="bottom-nav-item ">
+                        <i class="fas fa-home"></i>
+                        <span>Início</span>
+                    </a>
+                </div>
+                <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                    <a href="{{ url_for('main.monitor') }}" class="bottom-nav-item active">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Monitor</span>
+                    </a>
+                </div>
+                <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                    <a href="{{ url_for('main.alerts') }}" class="bottom-nav-item" style="position: relative;">
+                        <i class="fas fa-bell"></i>
+                        {% set unread = current_user.get_unread_alerts_count() %}
+                        {% if unread > 0 %}
+                        <span class="notification-badge">{{ unread }}</span>
+                        {% endif %}
+                        <span>Alertas</span>
+                    </a>
+                </div>
+                <div class="col-3" style="flex: 0 0 25%; max-width: 25%; padding: 0 4px;">
+                    <a href="{{ url_for('main.profile') }}" class="bottom-nav-item">
+                        <i class="fas fa-user"></i>
+                        <span>Perfil</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function toggleDevice(device, action) {
+            // Simulação - aqui você faria a chamada API real
+            console.log(`${device} ${action}`);
+
+            // Feedback visual
+            const statusBadge = event.target.closest('.control-card').querySelector('.control-status');
+            if (action === 'on') {
+                statusBadge.className = 'control-status active';
+                statusBadge.innerHTML = '<span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>Ligada';
+            } else {
+                statusBadge.className = 'control-status inactive';
+                statusBadge.innerHTML = '<span style="width: 6px; height: 6px; background: #ff6b6b; border-radius: 50%;"></span>Desligada';
+            }
+
+            // Aqui você integraria com sua API Flask
+            // fetch(`/api/device/${device}/${action}`, { method: 'POST' })
+        }
+
+        // Time filter tabs
+        const timeTabs = document.querySelectorAll('.time-tab');
+        timeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                timeTabs.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                const period = tab.dataset.period;
+                updateWeatherChart(period);
+            });
+        });
+
+        function updateWeatherChart(period) {
+            const container = document.getElementById('weather-chart-container');
+            const weatherData = {{ weather_data|tojson if weather_data else '{}' }};
+            
+            let chartHTML = '';
+            let subtitle = '';
+            let days = '';
+            
+            if (period === 'day') {
+                subtitle = 'Dados em tempo real';
+                days = '<span>Hoje</span><span>+1d</span><span>+2d</span><span>+3d</span><span>+4d</span><span>+5d</span><span>+6d</span>';
+            } else if (period === 'week') {
+                subtitle = 'Próximos 7 dias';
+                days = '<span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>';
+            } else if (period === 'month') {
+                subtitle = 'Próximos 30 dias';
+                days = '<span>S1</span><span>S2</span><span>S3</span><span>S4</span>';
+            }
+            
+            chartHTML = `
+                <div class="line-chart-card" style="padding: 16px;">
+                    <div class="line-chart-header" style="margin-bottom: 12px;">
+                        <div>
+                            <div class="line-chart-title" style="font-size: 0.9rem;">Temperatura - Manaus, AM</div>
+                            <div class="line-chart-subtitle" style="font-size: 0.65rem;">${subtitle}</div>
+                        </div>
+                        <div style="width: 32px; height: 32px; background: rgba(235, 193, 101, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #EBC165;">
+                            <i class="fas fa-thermometer-half" style="font-size: 0.9rem;"></i>
+                        </div>
+                    </div>
+                    <div class="line-chart-visual" style="height: 120px;">
+                        <svg width="100%" height="100%" viewBox="0 0 300 120" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="tempGradient${period}" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#EBC165;stop-opacity:0.3" />
+                                    <stop offset="100%" style="stop-color:#EBC165;stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M 0,80 Q 50,75 75,70 T 150,65 T 225,60 T 300,55 L 300,120 L 0,120 Z" fill="url(#tempGradient${period})" />
+                            <path d="M 0,80 Q 50,75 75,70 T 150,65 T 225,60 T 300,55" class="line-path" stroke="#EBC165" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="chart-days" style="margin-top: 8px; display: flex; justify-content: space-between; font-size: 0.65rem; color: rgba(197, 235, 219, 0.5);">
+                        ${days}
+                    </div>
+                </div>
+            `;
+            
+            // Add weekly forecast cards
+            chartHTML += `
+                <div class="weekly-forecast" style="margin-top: 16px; display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;">
+            `;
+            
+            const daysAbbr = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            for (let i = 0; i < 7; i++) {
+                const tempMax = weatherData.daily?.temperature_2m_max?.[i] ?? '--';
+                const tempMin = weatherData.daily?.temperature_2m_min?.[i] ?? '--';
+                const weatherCode = weatherData.daily?.weather_code?.[i] ?? 0;
+                
+                let icon = '<i class="fas fa-sun" style="color: #EBC165;"></i>';
+                if (weatherCode >= 95) icon = '<i class="fas fa-bolt" style="color: #EBC165;"></i>';
+                else if (weatherCode >= 80) icon = '<i class="fas fa-cloud-showers-heavy" style="color: #3b82f6;"></i>';
+                else if (weatherCode >= 60) icon = '<i class="fas fa-cloud-rain" style="color: #3b82f6;"></i>';
+                else if (weatherCode >= 40) icon = '<i class="fas fa-cloud-sun" style="color: #EBC165;"></i>';
+                else if (weatherCode >= 20) icon = '<i class="fas fa-cloud" style="color: rgba(197, 235, 219, 0.6);"></i>';
+                
+                chartHTML += `
+                    <div class="forecast-card" style="min-width: 70px; background: rgba(11, 47, 37, 0.5); border: 1px solid rgba(152, 211, 183, 0.15); border-radius: 12px; padding: 12px 8px; text-align: center;">
+                        <div style="font-size: 0.75rem; color: rgba(197, 235, 219, 0.6); margin-bottom: 8px;">${daysAbbr[i]}</div>
+                        <div style="font-size: 1.5rem; margin-bottom: 8px;">${icon}</div>
+                        <div style="font-size: 0.85rem; color: #c5ebdb; font-weight: 500;">
+                            <span style="color: #EBC165;">${typeof tempMax === 'number' ? Math.round(tempMax) : '--'}°</span>
+                            <span style="color: rgba(197, 235, 219, 0.5);"> / ${typeof tempMin === 'number' ? Math.round(tempMin) : '--'}°</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            chartHTML += '</div>';
+            
+            container.innerHTML = chartHTML;
+        }
+    </script>
+    {% endblock %}

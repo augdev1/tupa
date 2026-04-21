@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro - TUPA{% endblock %}
+
+{% block content %}
+<style>
+    .register-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 20px 0;
+    }
+    
+    .register-pattern {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(circle at 2px 2px, rgba(152, 211, 183, 0.03) 1px, transparent 0);
+        background-size: 24px 24px;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .register-glow {
+        position: fixed;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, rgba(152, 211, 183, 0.06) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .logo-ring {
+        background: radial-gradient(circle, rgba(235, 193, 101, 0.12) 0%, rgba(235, 193, 101, 0.04) 40%, transparent 70%);
+        border-radius: 50%;
+    }
+    
+    .title-glow {
+        text-shadow: 0 0 20px rgba(235, 193, 101, 0.3);
+    }
+    
+    .register-input {
+        background: rgba(30, 50, 45, 0.6) !important;
+        border: 1px solid rgba(139, 146, 142, 0.3) !important;
+        border-radius: 12px !important;
+        color: #c5ebdb !important;
+        padding: 12px 16px !important;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    .register-input:focus {
+        border-color: #EBC165 !important;
+        box-shadow: 0 0 0 3px rgba(235, 193, 101, 0.1) !important;
+        background: rgba(30, 50, 45, 0.8) !important;
+    }
+    
+    .register-input::placeholder {
+        color: rgba(197, 235, 219, 0.4) !important;
+    }
+    
+    .register-select {
+        background: rgba(30, 50, 45, 0.6) !important;
+        border: 1px solid rgba(139, 146, 142, 0.3) !important;
+        border-radius: 12px !important;
+        color: #c5ebdb !important;
+        padding: 12px 16px !important;
+    }
+    
+    .register-label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: rgba(197, 235, 219, 0.6);
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+    
+    .btn-register {
+        background: #EBC165 !important;
+        color: #0B2F25 !important;
+        border: none !important;
+        border-radius: 16px !important;
+        padding: 14px 32px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .btn-register:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 30px rgba(235, 193, 101, 0.4);
+    }
+    
+    .divider-line {
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(235, 193, 101, 0.4), transparent);
+        margin: 24px 0;
+    }
+    
+    .register-card {
+        background: rgba(11, 47, 37, 0.4);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(139, 146, 142, 0.15);
+        border-radius: 24px;
+        padding: 35px 40px;
+        width: 100%;
+        max-width: 480px;
+        position: relative;
+        z-index: 1;
+    }
+</style>
+
+<div class="register-pattern"></div>
+<div class="register-glow"></div>
+
+<div class="register-container">
+    <div class="register-card">
+        <!-- Logo -->
+        <div class="text-center mb-3">
+            <div class="position-relative d-inline-block">
+                <div class="logo-ring position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px;"></div>
+                <div class="rounded-circle d-flex align-items-center justify-content-center position-relative" 
+                     style="width: 80px; height: 80px; background: linear-gradient(135deg, rgba(152, 211, 183, 0.2), rgba(11, 47, 37, 0.6)); border: 2px solid rgba(235, 193, 101, 0.3);">
+                    <i class="fas fa-seedling fa-2x" style="color: #EBC165; filter: drop-shadow(0 0 8px rgba(235, 193, 101, 0.5));"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Title -->
+        <div class="text-center mb-4">
+            <h1 class="title-glow fw-bold text-uppercase mb-1" style="color: #EBC165; font-size: 1.8rem; letter-spacing: 0.05em;">TUPA</h1>
+            <p class="mb-0" style="color: rgba(197, 235, 219, 0.6); font-size: 0.85rem;">Criar nova conta</p>
+        </div>
+        
+        <!-- Form -->
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            
+            <div class="row">
+                <div class="col-6 mb-2">
+                    <label class="register-label d-block">{{ form.username.label.text }}</label>
+                    {{ form.username(class="register-input form-control" + (" is-invalid" if form.username.errors else ""), placeholder="Usuário") }}
+                    {% for error in form.username.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-6 mb-2">
+                    <label class="register-label d-block">{{ form.cpf.label.text }}</label>
+                    {{ form.cpf(class="register-input form-control" + (" is-invalid" if form.cpf.errors else ""), placeholder="CPF") }}
+                    {% for error in form.cpf.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label class="register-label d-block">{{ form.email.label.text }}</label>
+                {{ form.email(class="register-input form-control" + (" is-invalid" if form.email.errors else ""), placeholder="seu@email.com") }}
+                {% for error in form.email.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+            </div>
+            
+            <div class="mb-2">
+                <label class="register-label d-block">{{ form.full_name.label.text }}</label>
+                {{ form.full_name(class="register-input form-control" + (" is-invalid" if form.full_name.errors else ""), placeholder="Nome completo") }}
+                {% for error in form.full_name.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+            </div>
+            
+            <div class="row">
+                <div class="col-6 mb-2">
+                    <label class="register-label d-block">{{ form.user_type.label.text }}</label>
+                    {{ form.user_type(class="register-select form-select" + (" is-invalid" if form.user_type.errors else "")) }}
+                    {% for error in form.user_type.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-6 mb-2">
+                    <label class="register-label d-block">{{ form.phone.label.text }}</label>
+                    {{ form.phone(class="register-input form-control" + (" is-invalid" if form.phone.errors else ""), placeholder="Telefone") }}
+                    {% for error in form.phone.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Dados da Fazenda -->
+            <div class="divider-line" style="margin: 16px 0;"></div>
+            <p class="text-center mb-3" style="color: rgba(197, 235, 219, 0.5); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">
+                <i class="fas fa-tractor" style="color: #EBC165;"></i> Dados da Fazenda
+            </p>
+            
+            <div class="mb-2">
+                <label class="register-label d-block">{{ form.farm_name.label.text }}</label>
+                {{ form.farm_name(class="register-input form-control" + (" is-invalid" if form.farm_name.errors else ""), placeholder="Ex: Fazenda São João") }}
+                {% for error in form.farm_name.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+            </div>
+            
+            <div class="row">
+                <div class="col-6 mb-2">
+                    <label class="register-label d-block">{{ form.farm_location.label.text }}</label>
+                    {{ form.farm_location(class="register-input form-control" + (" is-invalid" if form.farm_location.errors else ""), placeholder="Ex: Manaus") }}
+                    {% for error in form.farm_location.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-6 mb-2">
+                    <label class="register-label d-block">{{ form.farm_state.label.text }}</label>
+                    {{ form.farm_state(class="register-select form-select" + (" is-invalid" if form.farm_state.errors else "")) }}
+                    {% for error in form.farm_state.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="divider-line" style="margin: 16px 0;"></div>
+            
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label class="register-label d-block">{{ form.password.label.text }}</label>
+                    {{ form.password(class="register-input form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Senha") }}
+                    {% for error in form.password.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="register-label d-block">{{ form.password2.label.text }}</label>
+                    {{ form.password2(class="register-input form-control" + (" is-invalid" if form.password2.errors else ""), placeholder="Confirmar") }}
+                    {% for error in form.password2.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                {{ form.submit(class="btn btn-register", value="Cadastrar") }}
+            </div>
+        </form>
+        
+        <div class="divider-line"></div>
+        
+        <p class="text-center mb-0" style="color: rgba(197, 235, 219, 0.5); font-size: 0.8rem;">
+            Já tem conta? <a href="{{ url_for('main.login') }}" style="color: #EBC165; text-decoration: none; font-weight: 500;">Entrar</a>
+        </p>
+        
+        <!-- Footer -->
+        <div class="text-center mt-3">
+            <div class="d-flex align-items-center justify-content-center gap-2">
+                <i class="fas fa-wifi" style="color: #EBC165; font-size: 0.7rem;"></i>
+                <span style="color: rgba(197, 235, 219, 0.35); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em;">Monitoramento IoT</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

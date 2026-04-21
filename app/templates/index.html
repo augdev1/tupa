@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}TUPA - Inteligência da Amazônia no Campo{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="text-center py-5 mb-4">
+    <div class="mb-3">
+        <i class="fas fa-seedling fa-4x" style="color: var(--tupa-primary);"></i>
+    </div>
+    <h1 class="display-4 fw-bold mb-3" style="color: var(--tupa-primary);">TUPA</h1>
+    <p class="lead mb-2" style="color: var(--tupa-text-secondary); font-size: 1.25rem;">
+        Inteligência da Amazônia no Campo
+    </p>
+    <p class="mb-4" style="color: var(--tupa-text-muted);">
+        Monitoramento IoT para prever riscos de seca e cheia,<br>
+        controlar irrigação e acompanhar sua produção em tempo real.
+    </p>
+    
+    {% if not current_user.is_authenticated %}
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <a class="btn btn-lg px-4 gap-3" href="{{ url_for('main.register') }}" style="background-color: transparent; color: #EBC165; border: 2px solid #EBC165; font-weight: 600;">
+            <i class="fas fa-user-plus me-2"></i>Criar Conta
+        </a>
+        <a class="btn btn-lg px-4" href="{{ url_for('main.login') }}" style="background-color: transparent; color: #EBC165; border: 2px solid #EBC165; font-weight: 600;">
+            <i class="fas fa-sign-in-alt me-2"></i>Entrar
+        </a>
+    </div>
+    {% else %}
+    <a class="btn btn-lg px-4" href="{{ url_for('main.dashboard') }}" style="background-color: transparent; color: #EBC165; border: 2px solid #EBC165; font-weight: 600;">
+        <i class="fas fa-chart-line me-2"></i>Acessar Dashboard
+    </a>
+    {% endif %}
+</div>
+
+<!-- Features Grid -->
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-3">
+        <div class="card-tupa h-100 text-center p-4">
+            <div class="mb-3">
+                <i class="fas fa-wifi fa-2x" style="color: var(--tupa-primary);"></i>
+            </div>
+            <h5 style="color: var(--tupa-text-primary);">Monitoramento IoT</h5>
+            <p class="small mb-0" style="color: var(--tupa-text-muted);">
+                Sensores ESP32/Arduino em tempo real: umidade, temperatura, nível de água.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card-tupa h-100 text-center p-4">
+            <div class="mb-3">
+                <i class="fas fa-exclamation-triangle fa-2x" style="color: var(--tupa-warning);"></i>
+            </div>
+            <h5 style="color: var(--tupa-text-primary);">Alertas Inteligentes</h5>
+            <p class="small mb-0" style="color: var(--tupa-text-muted);">
+                Previsão de cheias e secas com dados da ANA + sensores locais.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card-tupa h-100 text-center p-4">
+            <div class="mb-3">
+                <i class="fas fa-tint fa-2x" style="color: var(--tupa-info);"></i>
+            </div>
+            <h5 style="color: var(--tupa-text-primary);">Controle Remoto</h5>
+            <p class="small mb-0" style="color: var(--tupa-text-muted);">
+                Acione bombas de irrigação e LEDs UV direto do celular.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card-tupa h-100 text-center p-4">
+            <div class="mb-3">
+                <i class="fas fa-chart-line fa-2x" style="color: var(--tupa-success);"></i>
+            </div>
+            <h5 style="color: var(--tupa-text-primary);">Gestão Completa</h5>
+            <p class="small mb-0" style="color: var(--tupa-text-muted);">
+                Acompanhe culturas, atividades e histórico de produção.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Amazon Focus Section -->
+<div class="card-tupa p-4 mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h4 style="color: var(--tupa-primary);">
+                <i class="fas fa-leaf me-2"></i>Desenvolvido para a Amazônia
+            </h4>
+            <p style="color: var(--tupa-text-secondary);">
+                O TUPA foi criado pensando nas necessidades específicas dos agricultores da região amazônica. 
+                Com integração às APIs de monitoramento de cheias e dados climáticos locais, 
+                você tem informações precisas para tomar decisões na hora certa.
+            </p>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="p-3 rounded" style="background: rgba(11, 47, 37, 0.5);">
+                <i class="fas fa-water fa-3x mb-2" style="color: var(--tupa-primary);"></i>
+                <p class="mb-0 small" style="color: var(--tupa-text-muted);">
+                    Monitoramento de<br>nível de rios e reservatórios
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tech Stack -->
+<div class="text-center py-4">
+    <p class="small mb-3" style="color: var(--tupa-text-muted);">Tecnologias compatíveis</p>
+    <div class="d-flex justify-content-center gap-4 flex-wrap">
+        <span class="badge" style="background: var(--tupa-card-bg); color: var(--tupa-text-secondary); border: 1px solid var(--tupa-border);">
+            <i class="fab fa-python me-1"></i>ESP32
+        </span>
+        <span class="badge" style="background: var(--tupa-card-bg); color: var(--tupa-text-secondary); border: 1px solid var(--tupa-border);">
+            <i class="fas fa-microchip me-1"></i>Arduino
+        </span>
+        <span class="badge" style="background: var(--tupa-card-bg); color: var(--tupa-text-secondary); border: 1px solid var(--tupa-border);">
+            <i class="fas fa-broadcast-tower me-1"></i>LoRaWAN
+        </span>
+        <span class="badge" style="background: var(--tupa-card-bg); color: var(--tupa-text-secondary); border: 1px solid var(--tupa-border);">
+            <i class="fas fa-wifi me-1"></i>WiFi
+        </span>
+        <span class="badge" style="background: var(--tupa-card-bg); color: var(--tupa-text-secondary); border: 1px solid var(--tupa-border);">
+            <i class="fas fa-exchange-alt me-1"></i>MQTT
+        </span>
+    </div>
+</div>
+{% endblock %}

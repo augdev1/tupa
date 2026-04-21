@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+
+{% block title %}Alertas - TUPA{% endblock %}
+
+{% block content %}
+<style>
+    .alerts-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .alerts-header {
+        margin-bottom: 24px;
+    }
+    
+    .alerts-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #c5ebdb;
+        margin-bottom: 8px;
+    }
+    
+    .alerts-subtitle {
+        font-size: 0.9rem;
+        color: rgba(197, 235, 219, 0.6);
+    }
+    
+    .alert-card {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(139, 146, 142, 0.15);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .alert-card:hover {
+        border-color: rgba(152, 211, 183, 0.3);
+    }
+    
+    .alert-card.urgent {
+        border-color: rgba(255, 107, 107, 0.4);
+        background: rgba(255, 107, 107, 0.1);
+        animation: pulse-red 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-red {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+        }
+        50% {
+            box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+        }
+    }
+    
+    .alert-card.warning {
+        border-color: rgba(235, 193, 101, 0.4);
+        background: rgba(235, 193, 101, 0.1);
+        animation: pulse-yellow 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-yellow {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(235, 193, 101, 0.4);
+        }
+        50% {
+            box-shadow: 0 0 0 10px rgba(235, 193, 101, 0);
+        }
+    }
+    
+    .alert-card.warning {
+        border-color: rgba(235, 193, 101, 0.4);
+        background: rgba(235, 193, 101, 0.1);
+    }
+    
+    .alert-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .alert-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    .alert-icon.urgent {
+        background: rgba(255, 107, 107, 0.2);
+        color: #ff6b6b;
+    }
+    
+    .alert-icon.warning {
+        background: rgba(235, 193, 101, 0.2);
+        color: #EBC165;
+    }
+    
+    .alert-icon.info {
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+    }
+    
+    .alert-content {
+        flex: 1;
+    }
+    
+    .alert-type {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: rgba(197, 235, 219, 0.6);
+        margin-bottom: 4px;
+    }
+    
+    .alert-message {
+        font-size: 1rem;
+        color: #c5ebdb;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .alert-meta {
+        font-size: 0.85rem;
+        color: rgba(197, 235, 219, 0.5);
+    }
+    
+    .alert-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+    }
+    
+    .btn-resolve {
+        flex: 1;
+        padding: 10px 16px;
+        background: rgba(152, 211, 183, 0.2);
+        color: #98D3B7;
+        border: 1px solid rgba(152, 211, 183, 0.3);
+        border-radius: 8px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-resolve:hover {
+        background: rgba(152, 211, 183, 0.3);
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #c5ebdb;
+    }
+    
+    .section-count {
+        font-size: 0.8rem;
+        background: rgba(152, 211, 183, 0.15);
+        color: #98D3B7;
+        padding: 4px 12px;
+        border-radius: 12px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(197, 235, 219, 0.5);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+    
+    .empty-state p {
+        font-size: 0.9rem;
+    }
+    
+    .resolved-badge {
+        font-size: 0.7rem;
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+        padding: 4px 12px;
+        border-radius: 12px;
+    }
+    
+    /* Weather & River Section */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .info-card {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(139, 146, 142, 0.15);
+        border-radius: 16px;
+        padding: 20px;
+    }
+    
+    .info-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .info-card-icon {
+        font-size: 1.5rem;
+    }
+    
+    .info-card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #c5ebdb;
+    }
+    
+    .info-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #EBC165;
+    }
+    
+    .info-label {
+        font-size: 0.8rem;
+        color: rgba(197, 235, 219, 0.6);
+        margin-top: 4px;
+    }
+    
+    .weather-alert {
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .weather-alert.rain {
+        background: rgba(59, 130, 246, 0.15);
+        border-color: rgba(59, 130, 246, 0.3);
+        animation: pulse-blue 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-blue {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3);
+        }
+        50% {
+            box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+        }
+    }
+    
+    .river-alert.high {
+        background: rgba(255, 107, 107, 0.15);
+        border-color: rgba(255, 107, 107, 0.3);
+        animation: pulse-red 1.5s ease-in-out infinite;
+    }
+    
+    .river-alert.low {
+        background: rgba(235, 193, 101, 0.15);
+        border-color: rgba(235, 193, 101, 0.3);
+        animation: pulse-yellow 2s ease-in-out infinite;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .alerts-container {
+            padding: 16px;
+        }
+        
+        .alerts-title {
+            font-size: 1.3rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .alert-card {
+            padding: 16px;
+        }
+        
+        .alert-header {
+            gap: 10px;
+        }
+        
+        .alert-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+        }
+        
+        .alert-message {
+            font-size: 0.95rem;
+        }
+    }
+</style>
+
+<div class="alerts-container">
+    <!-- Header -->
+    <div class="alerts-header">
+        <h1 class="alerts-title">Alertas</h1>
+        <p class="alerts-subtitle">Gerencie e acompanhe os alertas do seu sistema agrícola.</p>
+    </div>
+    
+    <!-- Weather & River Level Info -->
+    <div class="info-grid">
+        <!-- Weather Card -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <div class="info-card-icon" style="color: #3b82f6;">
+                    <i class="fas fa-cloud-sun"></i>
+                </div>
+                <div class="info-card-title">Clima - Manaus, AM</div>
+            </div>
+            {% if weather_data and weather_data.get('current') %}
+            <div class="info-value">{{ weather_data.current.temperature_2m|round(1) }}°C</div>
+            <div class="info-label">Temperatura atual • {{ weather_data.current.relative_humidity_2m|round(0) }}% umidade</div>
+            {% if rain_forecast %}
+            <div class="weather-alert rain">
+                <i class="fas fa-cloud-rain"></i>
+                <div style="font-size: 0.85rem; color: #60a5fa;">Previsão de chuva nos próximos 3 dias</div>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="info-value">--°C</div>
+            <div class="info-label">Dados não disponíveis</div>
+            {% endif %}
+        </div>
+        
+        <!-- River Level Card -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <div class="info-card-icon" style="color: #98D3B7;">
+                    <i class="fas fa-water"></i>
+                </div>
+                <div class="info-card-title">Nível do Rio Negro</div>
+            </div>
+            {% if river_level %}
+            <div class="info-value">{{ river_level }}m</div>
+            <div class="info-label">Nível atual • Média anual: {{ river_average or '18.0' }}m</div>
+            {% if river_level > 25 %}
+            <div class="weather-alert river-alert high">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div style="font-size: 0.85rem; color: #ff6b6b;">Risco de inundação</div>
+            </div>
+            {% elif river_level < 12 %}
+            <div class="weather-alert river-alert low">
+                <i class="fas fa-exclamation-circle"></i>
+                <div style="font-size: 0.85rem; color: #EBC165;">Nível baixo - Seca</div>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="info-value">--m</div>
+            <div class="info-label">Dados não disponíveis</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Alertas Ativos -->
+    <div class="section-header">
+        <h2 class="section-title">Alertas Ativos</h2>
+        <span class="section-count">{{ active_alerts|length }}</span>
+    </div>
+    
+    {% if active_alerts %}
+    {% for alert in active_alerts %}
+    <div class="alert-card {% if alert.severity == 'critical' %}urgent{% elif alert.severity == 'warning' %}warning{% endif %}">
+        <div class="alert-header">
+            <div class="alert-icon {% if alert.severity == 'critical' %}urgent{% elif alert.severity == 'warning' %}warning{% else %}info{% endif %}">
+                {% if alert.severity == 'critical' %}
+                <i class="fas fa-exclamation-triangle"></i>
+                {% elif alert.severity == 'warning' %}
+                <i class="fas fa-exclamation-circle"></i>
+                {% else %}
+                <i class="fas fa-info-circle"></i>
+                {% endif %}
+            </div>
+            <div class="alert-content">
+                <div class="alert-type">{{ alert.alert_type|capitalize }}</div>
+                <div class="alert-message">{{ alert.message }}</div>
+                <div class="alert-meta">
+                    <i class="fas fa-map-marker-alt"></i> {{ alert.farm.name if alert.farm else 'Sem fazenda' }} • 
+                    <i class="fas fa-clock"></i> {{ alert.created_at.strftime('%d/%m/%Y %H:%M') }}
+                </div>
+            </div>
+        </div>
+        <form action="{{ url_for('main.resolve_alert', alert_id=alert.id) }}" method="POST">
+            <div class="alert-actions">
+                <input type="text" name="action_taken" placeholder="Ação tomada (opcional)" 
+                       style="flex: 2; padding: 10px 12px; border: 1px solid rgba(152, 211, 183, 0.3); 
+                              border-radius: 8px; background: rgba(11, 47, 37, 0.5); color: #c5ebdb; font-size: 0.85rem;">
+                <button type="submit" class="btn-resolve">
+                    <i class="fas fa-check"></i> Resolver
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-check-circle"></i>
+        <p>Nenhum alerta ativo no momento</p>
+    </div>
+    {% endif %}
+    
+    <!-- Histórico de Alertas -->
+    <div class="section-header" style="margin-top: 32px;">
+        <h2 class="section-title">Histórico</h2>
+        <span class="section-count">{{ resolved_alerts|length }}</span>
+    </div>
+    
+    {% if resolved_alerts %}
+    {% for alert in resolved_alerts %}
+    <div class="alert-card" style="opacity: 0.7;">
+        <div class="alert-header">
+            <div class="alert-icon info">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="alert-content">
+                <div class="alert-type">
+                    {{ alert.alert_type|capitalize }} 
+                    <span class="resolved-badge">Resolvido</span>
+                </div>
+                <div class="alert-message">{{ alert.message }}</div>
+                <div class="alert-meta">
+                    <i class="fas fa-map-marker-alt"></i> {{ alert.farm.name if alert.farm else 'Sem fazenda' }} • 
+                    <i class="fas fa-clock"></i> Resolvido em {{ alert.resolved_at.strftime('%d/%m/%Y %H:%M') if alert.resolved_at else 'N/A' }}
+                </div>
+                {% if alert.action_taken %}
+                <div style="font-size: 0.8rem; color: rgba(197, 235, 219, 0.6); margin-top: 4px;">
+                    <i class="fas fa-wrench"></i> Ação: {{ alert.action_taken }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-history"></i>
+        <p>Nenhum alerta resolvido ainda</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

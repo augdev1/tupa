@@ -1,0 +1,750 @@
+{% extends "base.html" %}
+
+{% block title %}{{ crop.name }} - Detalhes - TUPA{% endblock %}
+
+{% block content %}
+<style>
+    .plantio-detail-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .detail-card {
+        background: linear-gradient(135deg, #0B2F25 0%, #13342b 100%);
+        border: 1px solid rgba(235, 193, 101, 0.2);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .detail-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(235, 193, 101, 0.2);
+    }
+    
+    .detail-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: rgba(235, 193, 101, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+    }
+    
+    .detail-title h1 {
+        font-size: 1.5rem;
+        color: #98D3B7;
+        margin: 0;
+    }
+    
+    .detail-title p {
+        font-size: 0.9rem;
+        color: rgba(197, 235, 219, 0.6);
+        margin: 4px 0 0 0;
+    }
+    
+    .detail-section {
+        margin-bottom: 20px;
+    }
+    
+    .detail-section h3 {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #EBC165;
+        margin-bottom: 12px;
+    }
+    
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .detail-item {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(152, 211, 183, 0.1);
+        border-radius: 10px;
+        padding: 12px 16px;
+    }
+    
+    .detail-label {
+        font-size: 0.75rem;
+        color: rgba(197, 235, 219, 0.5);
+        margin-bottom: 4px;
+    }
+    
+    .detail-value {
+        font-size: 1rem;
+        color: #98D3B7;
+        font-weight: 500;
+    }
+    
+    .progress-section {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(235, 193, 101, 0.2);
+    }
+    
+    .progress-bar {
+        height: 12px;
+        background: rgba(11, 47, 37, 0.5);
+        border-radius: 6px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #EBC165, #98D3B7);
+        border-radius: 6px;
+        transition: width 0.3s ease;
+    }
+    
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 0.8rem;
+    }
+    
+    /* Cronômetro */
+    .timer-section {
+        background: rgba(235, 193, 101, 0.1);
+        border: 1px solid rgba(235, 193, 101, 0.3);
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 20px;
+    }
+    
+    .timer-display {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #EBC165;
+        text-align: center;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .timer-label {
+        text-align: center;
+        font-size: 0.8rem;
+        color: rgba(197, 235, 219, 0.6);
+        margin-top: 4px;
+    }
+    
+    /* Controles de Irrigação */
+    .irrigation-section {
+        background: rgba(152, 211, 183, 0.1);
+        border: 1px solid rgba(152, 211, 183, 0.3);
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 20px;
+    }
+    
+    .irrigation-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #4ade80;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-indicator.warning {
+        background: #f87171;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .irrigation-count {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #98D3B7;
+    }
+    
+    .irrigate-btn {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .irrigate-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    
+    /* Controles LED e Bomba */
+    .controls-section {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(152, 211, 183, 0.2);
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 20px;
+    }
+    
+    .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .control-btn {
+        padding: 12px 20px;
+        border-radius: 8px;
+        border: 1px solid;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .control-btn.led-on {
+        background: rgba(235, 193, 101, 0.3);
+        border-color: #EBC165;
+        color: #EBC165;
+    }
+    
+    .control-btn.led-off {
+        background: rgba(152, 211, 183, 0.1);
+        border-color: rgba(152, 211, 183, 0.3);
+        color: #98D3B7;
+    }
+    
+    .control-btn.pump-on {
+        background: rgba(59, 130, 246, 0.3);
+        border-color: #3b82f6;
+        color: #60a5fa;
+    }
+    
+    .control-btn.pump-off {
+        background: rgba(152, 211, 183, 0.1);
+        border-color: rgba(152, 211, 183, 0.3);
+        color: #98D3B7;
+    }
+    
+    /* Chatbot */
+    .chatbot-section {
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(152, 211, 183, 0.2);
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 20px;
+    }
+    
+    .chat-messages {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .chat-message {
+        margin-bottom: 12px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        max-width: 85%;
+        word-wrap: break-word;
+    }
+    
+    .chat-message.user {
+        background: rgba(59, 130, 246, 0.3);
+        margin-left: auto;
+        border-bottom-right-radius: 4px;
+    }
+    
+    .chat-message.assistant {
+        background: rgba(152, 211, 183, 0.2);
+        border-bottom-left-radius: 4px;
+    }
+    
+    .chat-message .role {
+        font-size: 0.7rem;
+        color: rgba(197, 235, 219, 0.6);
+        margin-bottom: 4px;
+    }
+    
+    .chat-message .content {
+        font-size: 0.9rem;
+        color: #C5EBDB;
+        line-height: 1.5;
+    }
+    
+    .chat-input-container {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .chat-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid rgba(152, 211, 183, 0.3);
+        border-radius: 8px;
+        background: rgba(11, 47, 37, 0.5);
+        color: #C5EBDB;
+        font-size: 0.9rem;
+    }
+    
+    .chat-input::placeholder {
+        color: rgba(197, 235, 219, 0.4);
+    }
+    
+    .chat-send-btn {
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #EBC165, #d4a853);
+        color: #0B2F25;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    .chat-send-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(235, 193, 101, 0.3);
+    }
+    
+    .actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+    }
+    
+    .btn {
+        flex: 1;
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-back {
+        background: rgba(152, 211, 183, 0.1);
+        color: #98D3B7;
+        border: 1px solid rgba(152, 211, 183, 0.3);
+    }
+    
+    .btn-back:hover {
+        background: rgba(152, 211, 183, 0.2);
+    }
+    
+    .btn-delete {
+        background: rgba(255, 107, 107, 0.1);
+        color: #ff6b6b;
+        border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+    
+    .btn-delete:hover {
+        background: rgba(255, 107, 107, 0.2);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .plantio-detail-container {
+            padding: 16px;
+        }
+        
+        .detail-card {
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .detail-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 12px;
+        }
+        
+        .detail-icon {
+            width: 56px;
+            height: 56px;
+            font-size: 1.8rem;
+        }
+        
+        .detail-title h1 {
+            font-size: 1.3rem;
+        }
+        
+        .detail-title p {
+            font-size: 0.85rem;
+        }
+        
+        .detail-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .detail-item {
+            padding: 10px 12px;
+        }
+        
+        .detail-value {
+            font-size: 0.95rem;
+        }
+        
+        .control-section {
+            flex-direction: column;
+        }
+        
+        .control-btn {
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+        }
+        
+        .progress-circle-container {
+            flex: 0 0 auto;
+            width: 100px;
+            height: 100px;
+        }
+        
+        .progress-circle-container svg {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .progress-info {
+            flex: 1;
+            text-align: center;
+            margin-top: 16px;
+        }
+        
+        .chat-messages {
+            max-height: 250px;
+        }
+        
+        .actions {
+            flex-direction: column;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .detail-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+        }
+        
+        .detail-title h1 {
+            font-size: 1.1rem;
+        }
+        
+        .detail-section h3 {
+            font-size: 0.75rem;
+        }
+        
+        .detail-label {
+            font-size: 0.7rem;
+        }
+        
+        .detail-value {
+            font-size: 0.9rem;
+        }
+        
+        .control-btn {
+            font-size: 0.85rem;
+            padding: 10px;
+        }
+        
+        .chat-input {
+            font-size: 0.85rem;
+            padding: 10px 12px;
+        }
+        
+        .chat-send-btn {
+            padding: 10px 16px;
+        }
+        
+        .btn {
+            font-size: 0.85rem;
+            padding: 10px 16px;
+        }
+    }
+</style>
+
+<div class="plantio-detail-container">
+    <!-- Card Principal -->
+    <div class="detail-card">
+        <div class="detail-header">
+            <div class="detail-icon">
+                {% if crop.crop_type == 'milho' %}🌽{% elif crop.crop_type == 'soja' %}🌱{% elif crop.crop_type == 'arroz' %}🌾{% else %}🌿{% endif %}
+            </div>
+            <div class="detail-title">
+                <h1>{{ crop.name }}</h1>
+                <p>{{ crop.farm.name if crop.farm else 'Sem fazenda' }} • {{ crop.crop_type|capitalize if crop.crop_type else 'Cultura não definida' }}</p>
+            </div>
+        </div>
+        
+        <!-- Informações -->
+        <div class="detail-section">
+            <h3>Informações do Cultivo</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Data do Plantio</div>
+                    <div class="detail-value">{{ crop.planting_date.strftime('%d/%m/%Y') if crop.planting_date else '-' }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Previsão de Colheita</div>
+                    <div class="detail-value">{{ crop.estimated_harvest_date.strftime('%d/%m/%Y') if crop.estimated_harvest_date else '-' }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Área Plantada</div>
+                    <div class="detail-value">{{ crop.area_hectares }} hectares</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Produção Esperada</div>
+                    <div class="detail-value">{{ crop.expected_yield }} kg</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cronômetro -->
+        <div class="timer-section">
+            <h3>⏱️ Tempo para Colheita</h3>
+            <div class="timer-display" id="cultivation-timer">00:00:00</div>
+            <div class="timer-label">Tempo restante</div>
+        </div>
+        
+        <!-- Progresso -->
+        <div class="progress-section">
+            <h3>Progresso do Cultivo</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ progress }}%"></div>
+            </div>
+            <div class="progress-info">
+                <span style="color: #98D3B7;">{{ progress }}% completo</span>
+                <span style="color: rgba(197, 235, 219, 0.5);">
+                    {% if crop.estimated_harvest_date %}
+                        {{ (crop.estimated_harvest_date - now).days }} dias para colheita
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Card de Irrigação -->
+    <div class="detail-card irrigation-section">
+        <h3>💧 Irrigação</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+                <div class="irrigation-status">
+                    <div class="status-indicator {% if crop.needs_irrigation %}warning{% endif %}"></div>
+                    <span style="color: #98D3B7;">
+                        {% if crop.needs_irrigation %}
+                            ⚠️ Precisa irrigar!
+                        {% else %}
+                            ✅ Irrigação em dia
+                        {% endif %}
+                    </span>
+                </div>
+                <div style="margin-top: 8px; font-size: 0.85rem; color: rgba(197, 235, 219, 0.6);">
+                    Total de irrigações: <span class="irrigation-count" id="irrigation-count">{{ crop.irrigation_count }}</span>
+                </div>
+                {% if crop.last_irrigation_date %}
+                <div style="font-size: 0.8rem; color: rgba(197, 235, 219, 0.5); margin-top: 4px;">
+                    Última: {{ crop.last_irrigation_date.strftime('%d/%m/%Y %H:%M') }}
+                </div>
+                {% endif %}
+            </div>
+            <button class="irrigate-btn" onclick="irrigate()">
+                <i class="fas fa-tint"></i>
+                Regar Agora
+            </button>
+        </div>
+    </div>
+    
+    <!-- Card de Controles -->
+    <div class="detail-card controls-section">
+        <h3>🔧 Controles do Dispositivo</h3>
+        <div class="controls-grid">
+            <button class="control-btn {% if crop.led_status %}led-on{% else %}led-off{% endif %}" id="led-btn" onclick="toggleLED()">
+                <i class="fas fa-lightbulb"></i>
+                LED {{ 'ON' if crop.led_status else 'OFF' }}
+            </button>
+            <button class="control-btn {% if crop.pump_status %}pump-on{% else %}pump-off{% endif %}" id="pump-btn" onclick="togglePump()">
+                <i class="fas fa-faucet"></i>
+                Bomba {{ 'ON' if crop.pump_status else 'OFF' }}
+            </button>
+        </div>
+    </div>
+    
+    <!-- Card do Chatbot -->
+    <div class="detail-card chatbot-section">
+        <h3>🤖 Assistente Agrícola - Especialista em {{ crop.crop_type|capitalize }}</h3>
+        <div class="chat-messages" id="chat-messages">
+            {% for conv in conversations %}
+            <div class="chat-message {{ conv.role }}">
+                <div class="role">{{ 'Você' if conv.role == 'user' else 'Especialista' }}</div>
+                <div class="content">{{ conv.message }}</div>
+            </div>
+            {% endfor %}
+            {% if not conversations %}
+            <div class="chat-message assistant">
+                <div class="role">Especialista</div>
+                <div class="content">Olá! Sou especialista em {{ crop.crop_type|capitalize if crop.crop_type else 'agricultura' }}. Posso te ajudar com dicas específicas sobre seu plantio de {{ crop.name }}. Como posso ajudar?</div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Digite sua pergunta sobre {{ crop.crop_type|capitalize if crop.crop_type else 'o plantio' }}..." onkeypress="if(event.key==='Enter')sendMessage()">
+            <button class="chat-send-btn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Ações -->
+    <div class="actions">
+        <a href="{{ url_for('main.plantios') }}" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+        <form action="{{ url_for('main.delete_plantio', crop_id=crop.id) }}" method="POST" style="flex: 1;" onsubmit="return confirm('Tem certeza que deseja excluir este plantio?');">
+            <button type="submit" class="btn btn-delete" style="width: 100%;">
+                <i class="fas fa-trash-alt"></i> Excluir Plantio
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Cronômetro de cultivo (regressivo para colheita)
+function updateTimer() {
+    const harvestDate = new Date('{{ crop.estimated_harvest_date if crop.estimated_harvest_date else crop.planting_date }}');
+    const now = new Date();
+    const diff = harvestDate - now;
+    
+    // Se já passou a data de colheita, mostrar 0
+    if (diff <= 0) {
+        document.getElementById('cultivation-timer').textContent = '00:00:00';
+        return;
+    }
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    document.getElementById('cultivation-timer').textContent = 
+        `${days}d ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+setInterval(updateTimer, 1000);
+updateTimer();
+
+// Irrigação
+function irrigate() {
+    fetch('/plantios/{{ crop.id }}/irrigate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById('irrigation-count').textContent = data.irrigation_count;
+            alert('✅ Irrigação registrada!');
+        }
+    });
+}
+
+// Toggle LED
+function toggleLED() {
+    fetch('/plantios/{{ crop.id }}/toggle-led', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            const btn = document.getElementById('led-btn');
+            btn.className = 'control-btn ' + (data.led_status ? 'led-on' : 'led-off');
+            btn.innerHTML = `<i class="fas fa-lightbulb"></i> LED ${data.led_status ? 'ON' : 'OFF'}`;
+        }
+    });
+}
+
+// Toggle Bomba
+function togglePump() {
+    fetch('/plantios/{{ crop.id }}/toggle-pump', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            const btn = document.getElementById('pump-btn');
+            btn.className = 'control-btn ' + (data.pump_status ? 'pump-on' : 'pump-off');
+            btn.innerHTML = `<i class="fas fa-faucet"></i> Bomba ${data.pump_status ? 'ON' : 'OFF'}`;
+        }
+    });
+}
+
+// Chatbot
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if(!message) return;
+    
+    // Adicionar mensagem do usuário
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.innerHTML += `
+        <div class="chat-message user">
+            <div class="role">Você</div>
+            <div class="content">${message}</div>
+        </div>
+    `;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    input.value = '';
+    
+    // Enviar para API
+    fetch('/plantios/{{ crop.id }}/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: message})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            chatMessages.innerHTML += `
+                <div class="chat-message assistant">
+                    <div class="role">Especialista</div>
+                    <div class="content">${data.response}</div>
+                </div>
+            `;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    });
+}
+</script>
+{% endblock %}

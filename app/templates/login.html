@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Entrar - TUPA{% endblock %}
+
+{% block content %}
+<style>
+    .login-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .login-pattern {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(circle at 2px 2px, rgba(152, 211, 183, 0.03) 1px, transparent 0);
+        background-size: 24px 24px;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .login-glow {
+        position: fixed;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(152, 211, 183, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .logo-ring {
+        background: radial-gradient(circle, rgba(235, 193, 101, 0.15) 0%, rgba(235, 193, 101, 0.05) 40%, transparent 70%);
+        border-radius: 50%;
+    }
+    
+    .title-glow {
+        text-shadow: 0 0 20px rgba(235, 193, 101, 0.3);
+    }
+    
+    .login-input {
+        background: rgba(30, 50, 45, 0.6) !important;
+        border: 1px solid rgba(139, 146, 142, 0.3) !important;
+        border-radius: 12px !important;
+        color: #c5ebdb !important;
+        padding: 14px 18px !important;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .login-input:focus {
+        border-color: #EBC165 !important;
+        box-shadow: 0 0 0 3px rgba(235, 193, 101, 0.1) !important;
+        background: rgba(30, 50, 45, 0.8) !important;
+    }
+    
+    .login-input::placeholder {
+        color: rgba(197, 235, 219, 0.4) !important;
+    }
+    
+    .login-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: rgba(197, 235, 219, 0.6);
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+    
+    .btn-login {
+        background: #EBC165 !important;
+        color: #0B2F25 !important;
+        border: none !important;
+        border-radius: 16px !important;
+        padding: 14px 32px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .btn-login:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 30px rgba(235, 193, 101, 0.4);
+    }
+    
+    .divider-line {
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(235, 193, 101, 0.4), transparent);
+        margin: 24px 0;
+    }
+    
+    .login-card {
+        background: rgba(11, 47, 37, 0.4);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(139, 146, 142, 0.15);
+        border-radius: 24px;
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        position: relative;
+        z-index: 1;
+    }
+</style>
+
+<div class="login-pattern"></div>
+<div class="login-glow"></div>
+
+<div class="login-container">
+    <div class="login-card">
+        <!-- Logo -->
+        <div class="text-center mb-4">
+            <div class="position-relative d-inline-block">
+                <div class="logo-ring position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 140px;"></div>
+                <div class="rounded-circle d-flex align-items-center justify-content-center position-relative" 
+                     style="width: 100px; height: 100px; background: linear-gradient(135deg, rgba(152, 211, 183, 0.2), rgba(11, 47, 37, 0.6)); border: 2px solid rgba(235, 193, 101, 0.3);">
+                    <i class="fas fa-seedling fa-3x" style="color: #EBC165; filter: drop-shadow(0 0 10px rgba(235, 193, 101, 0.5));"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Title -->
+        <div class="text-center mb-4">
+            <h1 class="title-glow fw-bold text-uppercase mb-2" style="color: #EBC165; font-size: 2.2rem; letter-spacing: 0.05em;">TUPA</h1>
+            <p class="mb-0" style="color: rgba(197, 235, 219, 0.7); font-size: 0.95rem; font-weight: 500;">Inteligência da Amazônia no Campo</p>
+        </div>
+        
+        <!-- Form -->
+        <form method="POST" action="" class="mt-4">
+            {{ form.hidden_tag() }}
+            
+            <div class="mb-3">
+                <label class="login-label d-block">{{ form.username.label.text }}</label>
+                {{ form.username(class="login-input form-control" + (" is-invalid" if form.username.errors else ""), placeholder="E-mail ou CPF") }}
+                {% for error in form.username.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+            </div>
+            
+            <div class="mb-3">
+                <label class="login-label d-block">{{ form.password.label.text }}</label>
+                {{ form.password(class="login-input form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Sua senha") }}
+                {% for error in form.password.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+            </div>
+            
+            <div class="mb-4">
+                <div class="form-check">
+                    {{ form.remember_me(class="form-check-input", style="background-color: rgba(30,50,45,0.6); border-color: rgba(139,146,142,0.3);") }}
+                    {{ form.remember_me.label(class="form-check-label", style="color: rgba(197, 235, 219, 0.6); font-size: 0.85rem;") }}
+                </div>
+            </div>
+
+            <div class="mb-4 text-end">
+                <a href="{{ url_for('main.reset_password_request') }}" style="color: rgba(197, 235, 219, 0.6); font-size: 0.85rem; text-decoration: none; transition: color 0.3s ease;">Esqueci a senha</a>
+            </div>
+            
+            <div class="d-grid">
+                {{ form.submit(class="btn btn-login", value="Entrar") }}
+            </div>
+        </form>
+        
+        <div class="divider-line"></div>
+        
+        <p class="text-center mb-0" style="color: rgba(197, 235, 219, 0.5); font-size: 0.85rem;">
+            Não tem conta? <a href="{{ url_for('main.register') }}" style="color: #EBC165; text-decoration: none; font-weight: 500;">Cadastre-se</a>
+        </p>
+        
+        <!-- Footer -->
+        <div class="text-center mt-4">
+            <div class="d-flex align-items-center justify-content-center gap-2">
+                <i class="fas fa-wifi" style="color: #EBC165; font-size: 0.8rem;"></i>
+                <span style="color: rgba(197, 235, 219, 0.4); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em;">Monitoramento IoT</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

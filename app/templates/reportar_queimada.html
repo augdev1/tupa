@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<style>
+  .report-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .report-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .report-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 10px;
+  }
+
+  .report-header p {
+    color: #6c757d;
+    font-size: 1.1rem;
+  }
+
+  .report-form {
+    background: #0B2F25;
+    border-radius: 20px;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+  }
+
+  .form-section {
+    margin-bottom: 30px;
+  }
+
+  .form-section label {
+    display: block;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 12px;
+    font-size: 1rem;
+  }
+
+  .form-section label i {
+    margin-right: 8px;
+    color: #e94560;
+  }
+
+  .file-upload-wrapper {
+    position: relative;
+    border: 2px dashed #e0e0e0;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: #f8f9fa;
+  }
+
+  .file-upload-wrapper:hover {
+    border-color: #e94560;
+    background: #fff5f7;
+  }
+
+  .file-upload-wrapper input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .file-upload-icon {
+    font-size: 3rem;
+    color: #e94560;
+    margin-bottom: 15px;
+  }
+
+  .file-upload-text {
+    color: #6c757d;
+    font-size: 1rem;
+  }
+
+  .preview-container {
+    margin-top: 20px;
+    display: none;
+  }
+
+  .preview-container img {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+  }
+
+  .btn-primary:disabled {
+    background: #e0e0e0;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    background: #f8f9fa;
+    color: #1a1a2e;
+    border: 2px solid #e0e0e0;
+  }
+
+  .btn-secondary:hover {
+    background: #e9ecef;
+    border-color: #e94560;
+    color: #e94560;
+  }
+
+  .btn-full {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #pickMap {
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .coords-display {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-top: 15px;
+    display: flex;
+    gap: 30px;
+  }
+
+  .coord-item {
+    flex: 1;
+  }
+
+  .coord-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .coord-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-family: 'Courier New', monospace;
+  }
+
+  .section-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 30px 0;
+  }
+
+  @media (max-width: 600px) {
+    .report-container {
+      padding: 0 15px;
+    }
+
+    .report-form {
+      padding: 25px;
+    }
+
+    .report-header h1 {
+      font-size: 2rem;
+    }
+
+    .coords-display {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>
+
+<div class="report-container">
+  <div class="report-header">
+    <h1>🔥 Reportar Queimada</h1>
+    <p>Envie uma foto com a localização para reportar uma queimada</p>
+  </div>
+
+  <form id="reportForm" class="report-form" enctype="multipart/form-data">
+    <div class="form-section">
+      <label><i class="fas fa-camera"></i>Foto da Queimada</label>
+      <div class="file-upload-wrapper">
+        <input type="file" id="fileInput" accept="image/*" required>
+        <div class="file-upload-icon">📷</div>
+        <div class="file-upload-text">Clique ou arraste a foto aqui</div>
+      </div>
+      <div id="preview" class="preview-container">
+        <img id="previewImage" src="" alt="Preview">
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="form-section">
+      <label><i class="fas fa-map-marker-alt"></i>Localização</label>
+      <button type="button" id="btnGPS" class="btn btn-secondary">
+        <span>📍</span> Usar GPS
+      </button>
+      <div id="pickMap" style="height: 350px; margin-top: 15px;"></div>
+      <div id="coordsDisplay" class="coords-display" style="display: none;">
+        <div class="coord-item">
+          <div class="coord-label">Latitude</div>
+          <div class="coord-value" id="lat">—</div>
+        </div>
+        <div class="coord-item">
+          <div class="coord-label">Longitude</div>
+          <div class="coord-value" id="lon">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <button type="submit" id="btnSubmit" class="btn btn-primary btn-full" disabled>
+        <span>🚀</span> Enviar Reporte
+      </button>
+    </div>
+  </form>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+(() => {
+  let selectedFile = null;
+  let selectedLat = null;
+  let selectedLon = null;
+  let pickMap = null;
+  let pickMarker = null;
+
+  const fileInput = document.getElementById('fileInput');
+  const previewImage = document.getElementById('previewImage');
+  const previewContainer = document.getElementById('preview');
+  const btnGPS = document.getElementById('btnGPS');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const latDisplay = document.getElementById('lat');
+  const lonDisplay = document.getElementById('lon');
+  const coordsDisplay = document.getElementById('coordsDisplay');
+
+  // File preview
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      selectedFile = file;
+      const url = URL.createObjectURL(file);
+      previewImage.src = url;
+      previewContainer.style.display = 'block';
+      checkForm();
+    }
+  });
+
+  // GPS
+  btnGPS.addEventListener('click', () => {
+    if (!navigator.geolocation) {
+      alert('Geolocalização não suportada');
+      return;
+    }
+    btnGPS.innerHTML = '<span>⏳</span> Obtendo localização...';
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        selectedLat = pos.coords.latitude;
+        selectedLon = pos.coords.longitude;
+        latDisplay.textContent = selectedLat.toFixed(5);
+        lonDisplay.textContent = selectedLon.toFixed(5);
+        coordsDisplay.style.display = 'flex';
+        updateMap();
+        checkForm();
+        btnGPS.innerHTML = '<span>📍</span> Usar GPS';
+      },
+      (err) => {
+        alert('Erro ao obter localização');
+        btnGPS.innerHTML = '<span>📍</span> Usar GPS';
+      }
+    );
+  });
+
+  // Map
+  function initMap() {
+    if (pickMap) return;
+    pickMap = L.map('pickMap').setView([-3.1190, -60.0217], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(pickMap);
+
+    pickMap.on('click', (e) => {
+      selectedLat = e.latlng.lat;
+      selectedLon = e.latlng.lng;
+      latDisplay.textContent = selectedLat.toFixed(5);
+      lonDisplay.textContent = selectedLon.toFixed(5);
+      coordsDisplay.style.display = 'flex';
+      updateMap();
+      checkForm();
+    });
+  }
+
+  function updateMap() {
+    if (!pickMap) initMap();
+    if (pickMarker) pickMap.removeLayer(pickMarker);
+    if (selectedLat !== null && selectedLon !== null) {
+      pickMarker = L.marker([selectedLat, selectedLon]).addTo(pickMap);
+      pickMap.setView([selectedLat, selectedLon], 13);
+    }
+  }
+
+  function checkForm() {
+    btnSubmit.disabled = !(selectedFile && selectedLat !== null && selectedLon !== null);
+  }
+
+  // Submit
+  document.getElementById('reportForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!selectedFile || selectedLat === null || selectedLon === null) return;
+
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = '<span>⏳</span> Enviando...';
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('lat', selectedLat);
+    formData.append('lon', selectedLon);
+
+    try {
+      const res = await fetch('/reportar-queimada', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('✅ Reporte enviado com sucesso!');
+        location.reload();
+      } else {
+        alert('❌ Erro: ' + (data.error || 'Erro ao enviar'));
+      }
+    } catch (err) {
+      alert('❌ Erro ao enviar: ' + err.message);
+    }
+
+    btnSubmit.disabled = false;
+    btnSubmit.innerHTML = '<span>🚀</span> Enviar Reporte';
+  });
+
+  // Initialize map on load
+  initMap();
+})();
+</script>
+{% endblock %}

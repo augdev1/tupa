@@ -1,0 +1,948 @@
+/* ============================================
+   TUPA - Inteligência da Amazônia no Campo
+   Tema: Verde Amazônico + Dourado
+   ============================================ */
+
+/* Cores do TUPA */
+:root {
+    /* Cores Principais */
+    --tupa-primary: #EBC165;           /* Dourado/Amarelo */
+    --tupa-primary-dark: #D4A84A;
+    --tupa-secondary: #98D3B7;        /* Verde Menta */
+    --tupa-secondary-dark: #7AB89A;
+    --tupa-tertiary: #A67C52;         /* Marrom/Terra */
+    --tupa-tertiary-dark: #8B6542;
+    
+    /* Cores de Fundo */
+    --tupa-bg-dark: #0B2F25;          /* Verde Escuro Principal */
+    --tupa-bg-darker: #051916;        /* Verde Quase Preto */
+    --tupa-bg-card: #0D3D32;          /* Verde Cartão */
+    --tupa-bg-elevated: #124D40;      /* Verde Elevado */
+    
+    /* Cores de Texto */
+    --tupa-text-primary: #F5F5F0;     /* Branco/Creme */
+    --tupa-text-secondary: #98D3B7;   /* Verde Claro */
+    --tupa-text-muted: #6B9B85;       /* Verde Médio */
+    
+    /* Cores de Alerta */
+    --tupa-danger: #E07A5F;           /* Coral/Terracota */
+    --tupa-warning: #EBC165;          /* Dourado */
+    --tupa-success: #98D3B7;          /* Verde Menta */
+    --tupa-info: #6B9B85;             /* Verde Médio */
+    
+    /* Gradientes */
+    --tupa-gradient-primary: linear-gradient(135deg, #0B2F25 0%, #124D40 100%);
+    --tupa-gradient-card: linear-gradient(180deg, #0D3D32 0%, #0B2F25 100%);
+    --tupa-gradient-gold: linear-gradient(135deg, #EBC165 0%, #D4A84A 100%);
+}
+
+/* ============================================
+   Base & Layout
+   ============================================ */
+
+body {
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--tupa-bg-dark);
+    color: var(--tupa-text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 700;
+}
+
+.container {
+    flex: 1;
+}
+
+/* ============================================
+   Navegação - Bottom Bar Mobile Style
+   ============================================ */
+
+.navbar-tupa {
+    background: var(--tupa-bg-card);
+    border-bottom: 1px solid rgba(152, 211, 183, 0.1);
+    padding: 0.75rem 0;
+}
+
+.navbar-tupa .navbar-brand {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--tupa-primary) !important;
+    letter-spacing: 1px;
+}
+
+.navbar-tupa .nav-link {
+    color: var(--tupa-text-secondary) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-tupa .nav-link:hover,
+.navbar-tupa .nav-link.active {
+    color: var(--tupa-primary) !important;
+    background: rgba(235, 193, 101, 0.1);
+}
+
+/* Bottom Navigation para Mobile */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--tupa-bg-card);
+    border-top: 1px solid rgba(152, 211, 183, 0.1);
+    padding: 0.75rem 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--tupa-text-muted);
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: color 0.3s ease;
+}
+
+.bottom-nav-item i,
+.bottom-nav-item svg {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item.active {
+    color: var(--tupa-primary);
+}
+
+/* ============================================
+   Cards - Estilo TUPA
+   ============================================ */
+
+.card {
+    background: var(--tupa-bg-card);
+    border: 1px solid rgba(152, 211, 183, 0.15);
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(152, 211, 183, 0.1);
+    padding: 1.25rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-title {
+    color: var(--tupa-text-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.card-subtitle {
+    color: var(--tupa-text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Cards de Métricas */
+.metric-card {
+    background: var(--tupa-gradient-card);
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.metric-card .metric-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--tupa-primary);
+    line-height: 1;
+}
+
+.metric-card .metric-label {
+    color: var(--tupa-text-secondary);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.metric-card .metric-unit {
+    color: var(--tupa-text-muted);
+    font-size: 0.75rem;
+}
+
+/* ============================================
+   Botões - Estilo TUPA
+   ============================================ */
+
+.btn {
+    border-radius: 0.75rem;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--tupa-gradient-gold);
+    color: var(--tupa-bg-dark);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #F5D47A 0%, #EBC165 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(235, 193, 101, 0.3);
+}
+
+.btn-secondary {
+    background: var(--tupa-bg-elevated);
+    color: var(--tupa-text-primary);
+    border: 1px solid rgba(152, 211, 183, 0.2);
+}
+
+.btn-secondary:hover {
+    background: var(--tupa-secondary);
+    color: var(--tupa-bg-dark);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--tupa-primary);
+    color: var(--tupa-primary);
+}
+
+.btn-outline:hover {
+    background: var(--tupa-primary);
+    color: var(--tupa-bg-dark);
+}
+
+/* Botão de Ação Flutuante */
+.fab {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--tupa-gradient-gold);
+    color: var(--tupa-bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(235, 193, 101, 0.4);
+    z-index: 999;
+}
+
+/* ============================================
+   Formulários - Estilo TUPA
+   ============================================ */
+
+.form-control,
+.form-select {
+    background: var(--tupa-bg-elevated);
+    border: 1px solid rgba(152, 211, 183, 0.2);
+    color: var(--tupa-text-primary);
+    border-radius: 0.75rem;
+    padding: 0.875rem 1rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: var(--tupa-bg-elevated);
+    border-color: var(--tupa-primary);
+    color: var(--tupa-text-primary);
+    box-shadow: 0 0 0 3px rgba(235, 193, 101, 0.15);
+}
+
+.form-control::placeholder {
+    color: var(--tupa-text-muted);
+}
+
+.form-label {
+    color: var(--tupa-text-secondary);
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-floating > label {
+    color: var(--tupa-text-muted);
+}
+
+/* Input Group */
+.input-group-text {
+    background: var(--tupa-bg-elevated);
+    border: 1px solid rgba(152, 211, 183, 0.2);
+    color: var(--tupa-text-secondary);
+}
+
+/* ============================================
+   Alertas - Estilo TUPA
+   ============================================ */
+
+.alert {
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+}
+
+.alert-danger {
+    background: rgba(224, 122, 95, 0.15);
+    color: var(--tupa-danger);
+    border-left: 4px solid var(--tupa-danger);
+}
+
+.alert-warning {
+    background: rgba(235, 193, 101, 0.15);
+    color: var(--tupa-warning);
+    border-left: 4px solid var(--tupa-warning);
+}
+
+.alert-success {
+    background: rgba(152, 211, 183, 0.15);
+    color: var(--tupa-success);
+    border-left: 4px solid var(--tupa-success);
+}
+
+.alert-info {
+    background: rgba(107, 155, 133, 0.15);
+    color: var(--tupa-info);
+    border-left: 4px solid var(--tupa-info);
+}
+
+/* ============================================
+   Badges & Status
+   ============================================ */
+
+.badge {
+    border-radius: 0.5rem;
+    font-weight: 600;
+    padding: 0.5em 0.75em;
+}
+
+.bg-critical {
+    background: var(--tupa-danger) !important;
+}
+
+.bg-warning {
+    background: var(--tupa-warning) !important;
+    color: var(--tupa-bg-dark) !important;
+}
+
+.bg-success {
+    background: var(--tupa-secondary) !important;
+    color: var(--tupa-bg-dark) !important;
+}
+
+.bg-info {
+    background: var(--tupa-info) !important;
+}
+
+/* ============================================
+   Sensor Status Cards
+   ============================================ */
+
+.sensor-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: var(--tupa-bg-elevated);
+    border-radius: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.sensor-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+}
+
+.sensor-icon.online {
+    background: rgba(152, 211, 183, 0.2);
+    color: var(--tupa-success);
+}
+
+.sensor-icon.offline {
+    background: rgba(224, 122, 95, 0.2);
+    color: var(--tupa-danger);
+}
+
+.sensor-info {
+    flex: 1;
+}
+
+.sensor-name {
+    font-weight: 600;
+    color: var(--tupa-text-primary);
+}
+
+.sensor-location {
+    font-size: 0.875rem;
+    color: var(--tupa-text-muted);
+}
+
+.sensor-value {
+    text-align: right;
+}
+
+.sensor-reading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--tupa-primary);
+}
+
+.sensor-unit {
+    font-size: 0.875rem;
+    color: var(--tupa-text-muted);
+}
+
+/* ============================================
+   Gráficos e Visualizações
+   ============================================ */
+
+.chart-container {
+    background: var(--tupa-bg-card);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Gauge/Circular Progress */
+.gauge {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.gauge-bg {
+    fill: none;
+    stroke: var(--tupa-bg-elevated);
+    stroke-width: 8;
+}
+
+.gauge-value {
+    fill: none;
+    stroke: var(--tupa-primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dasharray 0.5s ease;
+}
+
+.gauge-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.gauge-percentage {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--tupa-primary);
+}
+
+.gauge-label {
+    font-size: 0.75rem;
+    color: var(--tupa-text-muted);
+}
+
+/* Progress Bars */
+.progress {
+    background: var(--tupa-bg-elevated);
+    border-radius: 0.5rem;
+    height: 0.5rem;
+}
+
+.progress-bar {
+    background: var(--tupa-gradient-gold);
+    border-radius: 0.5rem;
+}
+
+/* ============================================
+   Water Tank Visualization
+   ============================================ */
+
+.tank-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    background: var(--tupa-bg-elevated);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.tank-level {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, var(--tupa-secondary) 0%, #5FA888 100%);
+    transition: height 0.5s ease;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.tank-info {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.tank-label {
+    color: var(--tupa-text-secondary);
+    font-size: 0.875rem;
+}
+
+.tank-capacity {
+    color: var(--tupa-primary);
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+/* ============================================
+   Device Control Cards
+   ============================================ */
+
+.device-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: var(--tupa-bg-elevated);
+    border-radius: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.device-info {
+    display: flex;
+    align-items: center;
+}
+
+.device-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+}
+
+.device-icon.pump {
+    background: rgba(235, 193, 101, 0.2);
+    color: var(--tupa-primary);
+}
+
+.device-icon.uv {
+    background: rgba(152, 211, 183, 0.2);
+    color: var(--tupa-secondary);
+}
+
+.device-status {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.device-status.active {
+    color: var(--tupa-success);
+}
+
+.device-status.inactive {
+    color: var(--tupa-text-muted);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    width: 56px;
+    height: 32px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--tupa-bg-card);
+    border: 1px solid rgba(152, 211, 183, 0.2);
+    border-radius: 32px;
+    transition: 0.3s;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background: var(--tupa-text-muted);
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+input:checked + .toggle-slider {
+    background: var(--tupa-primary);
+    border-color: var(--tupa-primary);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+    background: var(--tupa-bg-dark);
+}
+
+/* ============================================
+   Alert Cards
+   ============================================ */
+
+.alert-card {
+    padding: 1rem;
+    border-radius: 1rem;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid;
+}
+
+.alert-card.critical {
+    background: rgba(224, 122, 95, 0.1);
+    border-left-color: var(--tupa-danger);
+}
+
+.alert-card.warning {
+    background: rgba(235, 193, 101, 0.1);
+    border-left-color: var(--tupa-warning);
+}
+
+.alert-card.info {
+    background: rgba(107, 155, 133, 0.1);
+    border-left-color: var(--tupa-info);
+}
+
+.alert-card.resolved {
+    opacity: 0.6;
+}
+
+.alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.alert-title {
+    font-weight: 600;
+    color: var(--tupa-text-primary);
+}
+
+.alert-time {
+    font-size: 0.75rem;
+    color: var(--tupa-text-muted);
+}
+
+.alert-message {
+    color: var(--tupa-text-secondary);
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   Profile Page
+   ============================================ */
+
+.profile-header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: var(--tupa-gradient-card);
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid var(--tupa-primary);
+    object-fit: cover;
+    margin-bottom: 1rem;
+}
+
+.profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--tupa-text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.profile-location {
+    color: var(--tupa-text-muted);
+    font-size: 0.875rem;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.profile-stat {
+    background: var(--tupa-bg-elevated);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    text-align: center;
+}
+
+.profile-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--tupa-primary);
+}
+
+.profile-stat-label {
+    font-size: 0.75rem;
+    color: var(--tupa-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Menu Items */
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: var(--tupa-bg-elevated);
+    border-radius: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--tupa-text-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.menu-item:hover {
+    background: var(--tupa-bg-card);
+    transform: translateX(4px);
+}
+
+.menu-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    background: rgba(152, 211, 183, 0.15);
+    color: var(--tupa-secondary);
+}
+
+.menu-text {
+    flex: 1;
+    font-weight: 500;
+}
+
+.menu-arrow {
+    color: var(--tupa-text-muted);
+}
+
+/* ============================================
+   Tables - Dark Theme
+   ============================================ */
+
+.table {
+    color: var(--tupa-text-primary);
+}
+
+.table thead th {
+    border-bottom: 1px solid rgba(152, 211, 183, 0.2);
+    color: var(--tupa-text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+}
+
+.table tbody td {
+    border-bottom: 1px solid rgba(152, 211, 183, 0.1);
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background: rgba(152, 211, 183, 0.05);
+}
+
+/* ============================================
+   Hero / Landing
+   ============================================ */
+
+.hero {
+    background: var(--tupa-gradient-primary);
+    padding: 3rem 1.5rem;
+    border-radius: 1.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.hero-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+    color: var(--tupa-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+
+footer {
+    background: var(--tupa-bg-card);
+    border-top: 1px solid rgba(152, 211, 183, 0.1);
+    padding: 1.5rem 0;
+    margin-top: auto;
+    text-align: center;
+}
+
+footer p {
+    color: var(--tupa-text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 0;
+}
+
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 80px; /* Space for bottom nav */
+    }
+    
+    .hero {
+        padding: 2rem 1rem;
+        border-radius: 1rem;
+    }
+    
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .metric-card .metric-value {
+        font-size: 2rem;
+    }
+    
+    .card {
+        border-radius: 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.625rem 1.25rem;
+    }
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes pulse-gold {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(235, 193, 101, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(235, 193, 101, 0);
+    }
+}
+
+.pulse {
+    animation: pulse-gold 2s infinite;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fade-in 0.3s ease forwards;
+}
+
+/* ============================================
+   Utilities
+   ============================================ */
+
+.text-primary-tupa {
+    color: var(--tupa-primary) !important;
+}
+
+.text-secondary-tupa {
+    color: var(--tupa-secondary) !important;
+}
+
+.bg-dark-tupa {
+    background-color: var(--tupa-bg-dark) !important;
+}
+
+.bg-card-tupa {
+    background-color: var(--tupa-bg-card) !important;
+}
+
+.border-tupa {
+    border-color: rgba(152, 211, 183, 0.2) !important;
+}

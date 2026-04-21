@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Perfil - TUPA{% endblock %}
+
+{% block content %}
+<style>
+    .edit-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .back-btn {
+        width: 40px;
+        height: 40px;
+        background: rgba(152, 211, 183, 0.15);
+        border: 1px solid rgba(152, 211, 183, 0.3);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #98D3B7;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        background: rgba(152, 211, 183, 0.25);
+        border-color: rgba(152, 211, 183, 0.5);
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #EBC165;
+        letter-spacing: 0.05em;
+    }
+    
+    .edit-form {
+        background: rgba(11, 47, 37, 0.3);
+        border: 1px solid rgba(152, 211, 183, 0.15);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 600px;
+    }
+    
+    .form-group {
+        margin-bottom: 24px;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.85rem;
+        color: rgba(197, 235, 219, 0.7);
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(11, 47, 37, 0.5);
+        border: 1px solid rgba(152, 211, 183, 0.2);
+        border-radius: 8px;
+        color: #c5ebdb;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #EBC165;
+        box-shadow: 0 0 0 3px rgba(235, 193, 101, 0.1);
+    }
+    
+    .form-control::placeholder {
+        color: rgba(197, 235, 219, 0.4);
+    }
+    
+    .avatar-upload {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        padding: 24px;
+        background: rgba(11, 47, 37, 0.5);
+        border: 2px dashed rgba(152, 211, 183, 0.3);
+        border-radius: 12px;
+        margin-bottom: 24px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .avatar-upload:hover {
+        border-color: #EBC165;
+        background: rgba(11, 47, 37, 0.7);
+    }
+    
+    .avatar-preview {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid #EBC165;
+        object-fit: cover;
+        background: rgba(235, 193, 101, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #EBC165;
+    }
+    
+    .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid #EBC165;
+        background: rgba(235, 193, 101, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #EBC165;
+    }
+    
+    .upload-hint {
+        font-size: 0.8rem;
+        color: rgba(197, 235, 219, 0.6);
+        text-align: center;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #EBC165 0%, #d4a84a 100%);
+        border: none;
+        border-radius: 8px;
+        color: #0B2F25;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(235, 193, 101, 0.3);
+    }
+    
+    .btn-secondary {
+        width: 100%;
+        padding: 14px;
+        background: rgba(152, 211, 183, 0.1);
+        border: 1px solid rgba(152, 211, 183, 0.3);
+        border-radius: 8px;
+        color: #98D3B7;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 12px;
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(152, 211, 183, 0.2);
+        border-color: rgba(152, 211, 183, 0.5);
+    }
+    
+    .error-message {
+        color: #ff6b6b;
+        font-size: 0.8rem;
+        margin-top: 4px;
+    }
+    
+    .success-message {
+        padding: 12px 16px;
+        background: rgba(152, 211, 183, 0.2);
+        border: 1px solid rgba(152, 211, 183, 0.4);
+        border-radius: 8px;
+        color: #98D3B7;
+        font-size: 0.9rem;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+
+<div class="container" style="padding: 24px 16px;">
+    <div class="edit-header">
+        <a href="{{ url_for('main.profile') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="page-title">Editar Perfil</h1>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    {{ message }}
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST" enctype="multipart/form-data" class="edit-form">
+        {{ form.hidden_tag() }}
+        
+        <!-- Avatar Upload -->
+        <div class="avatar-upload" onclick="document.getElementById('profile_image').click()">
+            {% if current_user.profile_image %}
+            <img src="{{ current_user.profile_image }}" alt="Profile" class="avatar-preview">
+            {% else %}
+            <div class="avatar-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+            {% endif %}
+            <div class="upload-hint">
+                <i class="fas fa-camera" style="margin-right: 8px;"></i>
+                Clique para alterar foto
+            </div>
+            {{ form.profile_image(class="d-none", id="profile_image") }}
+        </div>
+        
+        <!-- Full Name -->
+        <div class="form-group">
+            <label class="form-label" for="full_name">Nome Completo</label>
+            {{ form.full_name(class="form-control", id="full_name") }}
+            {% if form.full_name.errors %}
+                {% for error in form.full_name.errors %}
+                <div class="error-message">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <!-- Email -->
+        <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            {{ form.email(class="form-control", id="email") }}
+            {% if form.email.errors %}
+                {% for error in form.email.errors %}
+                <div class="error-message">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <!-- Phone (Optional) -->
+        <div class="form-group">
+            <label class="form-label" for="phone">Telefone (Opcional)</label>
+            {{ form.phone(class="form-control", id="phone", placeholder="(00) 00000-0000") }}
+            {% if form.phone.errors %}
+                {% for error in form.phone.errors %}
+                <div class="error-message">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <!-- Notification Preferences -->
+        <div style="margin-bottom: 24px;">
+            <label class="form-label" style="margin-bottom: 12px;">Preferências de Notificação</label>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    {{ form.alert_email(style="width: 20px; height: 20px; accent-color: #EBC165;") }}
+                    <label for="alert_email" style="color: #c5ebdb; font-size: 0.9rem;">Receber alertas por email</label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    {{ form.alert_sms(style="width: 20px; height: 20px; accent-color: #EBC165;") }}
+                    <label for="alert_sms" style="color: #c5ebdb; font-size: 0.9rem;">Receber alertas por SMS</label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    {{ form.alert_push(style="width: 20px; height: 20px; accent-color: #EBC165;") }}
+                    <label for="alert_push" style="color: #c5ebdb; font-size: 0.9rem;">Receber notificações push</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn-primary">
+            <i class="fas fa-save" style="margin-right: 8px;"></i>
+            Salvar Alterações
+        </button>
+        
+        <!-- Cancel Button -->
+        <a href="{{ url_for('main.profile') }}" class="btn-secondary" style="display: block; text-decoration: none;">
+            <i class="fas fa-times" style="margin-right: 8px;"></i>
+            Cancelar
+        </a>
+    </form>
+</div>
+
+<script>
+    // Preview image on file selection
+    document.getElementById('profile_image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.querySelector('.avatar-preview, .avatar-placeholder');
+                if (preview) {
+                    preview.outerHTML = `<img src="${e.target.result}" alt="Profile" class="avatar-preview">`;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Phone mask
+    document.getElementById('phone').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 11) value = value.slice(0, 11);
+        
+        if (value.length > 2) {
+            value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+        }
+        if (value.length > 10) {
+            value = `${value.slice(0, 10)}-${value.slice(10)}`;
+        }
+        
+        e.target.value = value;
+    });
+</script>
+{% endblock %}
